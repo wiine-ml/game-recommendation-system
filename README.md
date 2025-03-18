@@ -76,11 +76,11 @@ Prettier: ^3.5.1
 ---
 
 ## 图片示例
-![image](README_IMG\1.png)
-![image](README_IMG\2.png)
-![image](README_IMG\3.png)
-![image](README_IMG\4.png)
-![image](README_IMG\5.png)
-![image](README_IMG\6.png)
-![image](README_IMG\7.png)
-![image](README_IMG\8.png)
+![image](./README_IMG/1.png)
+![image](./README_IMG/2.png)
+![image](./README_IMG/3.png)
+![image](./README_IMG/4.png)
+![image](./README_IMG/5.png)
+![image](./README_IMG/6.png)
+![image](./README_IMG/7.png)
+![image](./README_IMG/8.png)
