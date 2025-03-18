@@ -179,3 +179,19 @@ class Game(db.Model):
         # 分页
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         return pagination
+    
+    @staticmethod
+    def autocomplete_game_title(input, limit = None):
+        """根据用户输入实现自动填充"""
+        if not limit:
+            limit = 5
+        query = Game.query.filter(Game.gameTitle.like(f'%{input}%')).limit(limit)
+
+        return [game.gameTitle for game in query.all()]
+    
+
+    @staticmethod
+    def get_game_by_title(title):
+        """根据游戏名称获取游戏"""
+        return Game.query.filter_by(gameTitle=title).first()
+        

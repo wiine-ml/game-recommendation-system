@@ -126,7 +126,7 @@ export default {
 button {
   margin: 0 10px;
   padding: 8px 16px;
-  background-color: #4caf50;
+  background-color: var(--main-color);
   color: white;
   border: none;
   border-radius: 4px;
@@ -134,7 +134,7 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: var(--primary-color);
 }
 
 button:disabled {

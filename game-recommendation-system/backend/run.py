@@ -13,7 +13,7 @@ app = create_app()
 db.init_app(app)
 
 
-from app.routers import test_bp, login_bp, register_bp, notice_bp, game_bp, news_bp, interaction_bp, recommendation_bp, review_bp, user_bp, administrator_bp
+from app.routers import test_bp, login_bp, register_bp, notice_bp, game_bp, news_bp, interaction_bp, recommendation_bp, review_bp, user_bp, administrator_bp, autocomplete_bp
 
 
 app.register_blueprint(user_bp)
@@ -25,6 +25,7 @@ app.register_blueprint(review_bp)
 app.register_blueprint(notice_bp)
 app.register_blueprint(register_bp)
 app.register_blueprint(interaction_bp)
+app.register_blueprint(autocomplete_bp)
 app.register_blueprint(administrator_bp)
 app.register_blueprint(recommendation_bp)
 

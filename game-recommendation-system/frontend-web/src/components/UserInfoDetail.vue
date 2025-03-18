@@ -1,6 +1,7 @@
 <template>
   <div class="user-avatar-container" @mouseenter="showInfo" @mouseleave="hideInfo">
-    <img :src="avatarSrc" alt="User Avatar" class="user-avatar" />
+    <!-- 动态绑定头像图片的 src 属性 -->
+    <img :src="userAvatar" alt="Avatar" class="user-avatar" />
     <div class="user-info-panel" v-if="showInfoPanel">
       <div class="user-info-content">
         <div class="info-row" v-if="this.$store.getters.currentLoginType === 'user'">
@@ -20,6 +21,7 @@
 <script>
 import store from '@/services/Store.js'
 import DataService from '@/services/DataService.js'
+import { mapGetters } from 'vuex'
 
 export default {
   data() {
@@ -29,20 +31,28 @@ export default {
         subscribed_count: 0,
         review_count: 0,
       },
-      avatarSrc: '/guest.jpg', // 默认头像
       hoverTimeout: null,
       hideTimeout: null,
     }
   },
+  computed: {
+    ...mapGetters('user', ['avatarUrl']),
+    userAvatar() {
+      // 如果用户已登录且有头像 URL，则返回头像 URL
+      if (store.getters.isLogin && this.avatarUrl) {
+        return this.avatarUrl
+      }
+      // 如果用户未登录或没有头像 URL，返回默认头像
+      return '/default-avatar.png'
+    },
+  },
   methods: {
     async showInfo() {
-      // 清除之前的隐藏定时器
       if (this.hideTimeout) {
         clearTimeout(this.hideTimeout)
         this.hideTimeout = null
       }
 
-      // 设置一个短暂的延迟，避免鼠标快速移动时频繁触发
       this.hoverTimeout = setTimeout(async () => {
         try {
           const response = await DataService.get('/interactions/read', {
@@ -58,13 +68,11 @@ export default {
       }, 300)
     },
     hideInfo() {
-      // 清除之前的显示定时器
       if (this.hoverTimeout) {
         clearTimeout(this.hoverTimeout)
         this.hoverTimeout = null
       }
 
-      // 设置一个短暂的延迟，避免鼠标快速移动时频繁触发
       this.hideTimeout = setTimeout(() => {
         this.showInfoPanel = false
       }, 300)

@@ -81,7 +81,6 @@ def read_subscribed_game():
         "totalPages": total_pages
     }), 200
 
-
 @game_bp.route('/api/games/read/page/<int:page_id>', methods=['GET'])
 def read_page_game(page_id):
     """根据游戏类型查找游戏，并支持分页"""
@@ -334,7 +333,38 @@ def read_top_subscribed_games_paginated(page_id):
         'success': True,
     }), 200
 
-
+@game_bp.route('/api/games/read/search/<string:game_title>', methods=['GET'])
+def search_game_by_title(game_title):
+    """根据游戏标题搜索游戏"""
+    try:
+        user_id = request.args.get('user_id')
+        target = Game.get_game_by_title(game_title)
+        if not target:
+            return jsonify({"error": "游戏未找到"}), 404
+        return jsonify({
+            "data": {
+                "id": target.id,
+                "gameTitle": target.gameTitle,
+                "gameGenre": target.gameGenre,
+                "gamePlatform": target.gamePlatform,
+                "gameDeveloper": target.gameDeveloper,
+                "gamePublisher": target.gamePublisher,
+                "ratingPhrase": target.ratingPhrase,
+                "officalRating": target.officalRating,
+                "releaseYear": target.releaseYear,
+                "releaseMonth": target.releaseMonth,
+                "releaseDay": target.releaseDay,
+                "gameImage": target.gameImage,
+                "gameUrl": target.gameUrl,
+            },
+            "msg": '查询成功',
+            'success': True
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "data": [],
+            "msg": str(e),
+        }), 500
 
 @game_bp.route('/api/games/read/search', methods=['GET'])
 def search_game():

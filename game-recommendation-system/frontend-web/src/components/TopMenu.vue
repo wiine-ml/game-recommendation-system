@@ -7,7 +7,6 @@
       <p v-if="isLogin">{{ welcomeMessage }}</p>
       <p v-else>暂未登录</p>
       <UserInfoDetail v-if="isLogin" />
-      <img v-else src="/guest.jpg" alt="User Avatar" />
     </div>
   </nav>
   <nav class="navbar-navigations">
@@ -34,25 +33,114 @@
     </div>
     <div class="navbar-search">
       <div class="search-container" v-if="this.$store.getters.currentLoginType === 'user'">
-        <input type="text" placeholder="Search..." v-model="searchQuery" />
-        <button @click="performSearch">搜索</button>
+        <input
+          type="text"
+          placeholder="Search..."
+          v-model="searchQuery"
+          @input="debounceFetchSuggestions"
+          @keydown.enter="performSearch"
+        />
+        <button id="cleanBtn" @click="cleanSearch">&#10006;</button>
+        <button id="searchBtn" @click="performSearch">搜索</button>
+        <!-- 搜索提示 -->
+        <div class="search-suggestions" v-if="onSearchComplete">
+          <ul>
+            <li
+              v-for="(suggestion, index) in searchSuggestions"
+              :key="index"
+              @click="selectSuggestion(suggestion)"
+            >
+              {{ suggestion }}
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>
+
+  <GameDetail :showDetail="showDetail" :gameDetail="selectedGame" @close-detail="closeDetail" />
 </template>
 
 <script>
 import store from '../services/Store.js'
 import UserInfoDetail from './UserInfoDetail.vue'
+import DataService from '../services/DataService.js'
+import GameDetail from './GameDetail.vue'
+
 export default {
   props: ['activeTopMenu'],
   components: {
     UserInfoDetail,
+    GameDetail,
   },
   emits: ['updataSubMenu'],
+  data() {
+    return {
+      searchQuery: '',
+      searchSuggestions: [],
+      debounceTimer: null,
+      showDetail: false,
+      selectedGame: null,
+    }
+  },
   methods: {
+    cleanSearch() {
+      this.searchQuery = ''
+      this.searchSuggestions = []
+    },
     selectMenu(menu) {
       this.$emit('updataSubMenu', menu)
+    },
+    // 获取搜索提示
+    debounceFetchSuggestions() {
+      // 清除之前的定时器
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer)
+      }
+      // 设置新的定时器，延迟0.5秒后发送请求
+      this.debounceTimer = setTimeout(this.fetchSearchSuggestions, 500)
+    },
+    async fetchSearchSuggestions() {
+      if (this.searchQuery.length < 1) {
+        this.searchSuggestions = []
+        return
+      }
+      try {
+        const response = await DataService.post('/autocomplete/' + this.searchQuery, {
+          limit: 5,
+        })
+        this.searchSuggestions = response.data.data.result_games
+        console.log('resp:', this.searchSuggestions)
+      } catch (error) {
+        console.error('搜索提示获取失败:', error)
+      }
+    },
+    // 执行搜索
+    async performSearch() {
+      if (this.searchQuery.trim().length > 0) {
+        try {
+          const response = await DataService.get(
+            `/games/read/search/${encodeURIComponent(this.searchQuery)}`,
+          )
+          if (response.data.success) {
+            this.selectedGame = response.data.data
+            this.showDetail = true
+          } else {
+            console.log('游戏未找到')
+          }
+        } catch (error) {
+          console.error('搜索失败:', error)
+        }
+      }
+    },
+    // 选择搜索提示
+    selectSuggestion(suggestion) {
+      this.searchQuery = suggestion
+      this.searchSuggestions = []
+      this.performSearch()
+    },
+    closeDetail() {
+      this.showDetail = false
     },
   },
   computed: {
@@ -71,11 +159,49 @@ export default {
       }
       return ''
     },
+    onSearchComplete() {
+      console.log('searchQuery:', this.searchQuery.length)
+      console.log('suggestions:', this.searchSuggestions.length)
+      return this.searchSuggestions.length > 0 && this.searchQuery.length > 0
+    },
   },
 }
 </script>
 
 <style scoped>
+/* 添加搜索提示的样式 */
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  background-color: var(--primary-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.search-suggestions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-suggestions li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.search-suggestions li:hover {
+  background-color: var(--secondary-color);
+}
+
+.search-container {
+  position: relative;
+}
+/*其他 */
 body {
   margin: 0;
   padding: 0;
@@ -150,16 +276,29 @@ li {
   box-shadow: 0 0 5px var(--main-color);
 }
 
-button {
+#searchBtn {
   padding: 0.5rem;
-  width: 50px;
+  width: 80px;
   height: 30px;
-  background: linear-gradient(to right, var(--primary-color-alpha2) 1%, var(--main-color) 99%);
+  background: var(--main-color-alpha1);
   color: var(--contrast-color);
   border: none;
   border-radius: 0 5px 5px 0;
   cursor: pointer;
+  box-shadow: 0 0 10px var(--primary-color);
 }
+
+#cleanBtn {
+  padding: 0.5rem;
+  width: 50px;
+  height: 30px;
+  background: linear-gradient(to right, var(--primary-color-alpha2) 1%, var(--main-color) 99%);
+  color: #000;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
 .search-container {
   display: flex;
   align-items: center;
