@@ -3,7 +3,6 @@
   <div class="top-menu-container">
     <TopMenu :activeTopMenu="activeTopMenu" @updataSubMenu="UpdateSubMenu" />
   </div>
-
   <!-- 中间内容区 -->
   <div class="middle-container">
     <!-- 左侧子菜单栏 -->
@@ -34,6 +33,8 @@ import LoginBox from './components/LoginBox.vue'
 import RegistrationBox from './components/RegistrationBox.vue'
 import MainContentBox from './components/MainContentBox.vue'
 
+import { mapActions } from 'vuex'
+
 export default {
   components: {
     TopMenu,
@@ -51,6 +52,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions('user', ['fetchAvatar']),
     UpdateLoginView(newView) {
       this.curLoginView = newView
     },
@@ -66,6 +68,18 @@ export default {
     // 在应用挂载时加载上次使用设置
     this.$store.dispatch('preference/loadThemeFromStorage')
     this.$store.dispatch('preference/loadItemPerpageFromStorage')
+    if (this.isLogin) {
+      this.fetchAvatar().then((response) => {
+        if (response.success) {
+          this.$store.commit('user/setAvatarFile', response.data.avatarFile)
+        }
+      })
+    }
+    if (this.$store.getters.currentLoginType === 'user') {
+      this.activeSubMenu = '首页'
+    } else {
+      this.activeSubMenu = '公告'
+    }
   },
 }
 </script>

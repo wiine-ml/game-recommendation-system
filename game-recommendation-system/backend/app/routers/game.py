@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from ..models import Game, Interaction
-import datetime
+import os
+from PIL import Image
 
 game_bp = Blueprint('game_api', __name__)
 
@@ -9,6 +10,7 @@ game_bp = Blueprint('game_api', __name__)
 def create_game():
     """创建游戏"""
     pass
+
 
 @game_bp.route('/api/games/read/subscribed', methods=['GET'])
 def read_subscribed_game():
@@ -81,6 +83,7 @@ def read_subscribed_game():
         "totalPages": total_pages
     }), 200
 
+
 @game_bp.route('/api/games/read/page/<int:page_id>', methods=['GET'])
 def read_page_game(page_id):
     """根据游戏类型查找游戏，并支持分页"""
@@ -151,6 +154,7 @@ def read_page_game(page_id):
         "msg": "获取分页游戏列表成功",
         "success": True
     }), 200
+
 
 @game_bp.route('/api/games/read/subscribed/page/<int:page_id>', methods=['GET'])
 def read_subscribed_game_paginated(page_id):
@@ -333,6 +337,60 @@ def read_top_subscribed_games_paginated(page_id):
         'success': True,
     }), 200
 
+
+@game_bp.route('/api/games/read/recently/page/<int:page_id>', methods=['GET'])
+def read_recently_games_paginated(page_id):
+    """获取最近更新的游戏分页列表"""
+    items_per_page = int(request.args.get('itemPerpage', 10))  # 每页显示的条数，默认为10
+    user_id = request.args.get('user_id')  # 可选用户ID，用于获取用户交互状态
+
+    # 调用 Game 类中的方法获取分页数据
+    pagination = Game.get_recently_updated_games(page=page_id, per_page=items_per_page)
+    games = pagination.items
+    total_pages = pagination.pages
+
+    if not games:
+        return jsonify({"message": "没有游戏数据"}), 200
+
+    # 构造返回数据
+    game_list = []
+    for game in games:
+        # 查询用户与该游戏的交互信息（如果有用户ID参数）
+        interaction = None
+        if user_id:
+            interaction = Interaction.get_by_user_and_game(user_id, game.id)
+
+        game_data = {
+            "id": game.id,
+            "gameTitle": game.gameTitle,
+            "gameGenre": game.gameGenre,
+            "gamePlatform": game.gamePlatform,
+            "gameDeveloper": game.gameDeveloper,
+            "gamePublisher": game.gamePublisher,
+            "followers": game.followers,
+            "rating": round(game.rating, 2) if game.rating else 0,
+            "ratingPhrase": game.ratingPhrase,
+            "officalRating": game.officalRating,
+            "releaseYear": game.releaseYear,
+            "releaseMonth": game.releaseMonth,
+            "releaseDay": game.releaseDay,
+            "gameImage": game.gameImage,
+            "gameUrl": game.gameUrl,
+            "subscribed": interaction.subscribed if interaction else False,
+            "disliked": interaction.disliked if interaction else False
+        }
+        game_list.append(game_data)
+
+    return jsonify({
+        'data': {
+            "games": game_list,
+            "totalPages": total_pages,
+        },
+        'msg': '查询成功',
+        'success': True,
+    }), 200
+    
+
 @game_bp.route('/api/games/read/search/<string:game_title>', methods=['GET'])
 def search_game_by_title(game_title):
     """根据游戏标题搜索游戏"""
@@ -365,6 +423,7 @@ def search_game_by_title(game_title):
             "data": [],
             "msg": str(e),
         }), 500
+
 
 @game_bp.route('/api/games/read/search', methods=['GET'])
 def search_game():
@@ -565,3 +624,48 @@ def update_game(game_id):
 def delete_game(game_id):
     """删除游戏"""
     pass
+
+
+
+@game_bp.route('/api/games/rating_distribution/<int:game_id>', methods=['GET'])
+def get_rating_distribution(game_id):
+    """统计游戏的评分分布"""
+    try:
+        # 查询指定游戏的所有评分记录
+        ratings = Interaction.query.filter_by(game_id=game_id).all()
+        
+        # 初始化五个评分区间的计数器
+        rating_distribution = {
+            '0-1': 0,
+            '1-2': 0,
+            '2-3': 0,
+            '3-4': 0,
+            '4-5': 0
+        }
+        
+        # 遍历评分记录，统计每个区间的数量
+        for rating in ratings:
+            if rating.review_score is not None:
+                score = float(rating.review_score)
+                if 0 < score < 1:
+                    rating_distribution['0-1'] += 1
+                elif 1 <= score < 2:
+                    rating_distribution['1-2'] += 1
+                elif 2 <= score < 3:
+                    rating_distribution['2-3'] += 1
+                elif 3 <= score < 4:
+                    rating_distribution['3-4'] += 1
+                elif 4 <= score <= 5:
+                    rating_distribution['4-5'] += 1
+        
+        return jsonify({
+            'data': rating_distribution,
+            'msg': '查询成功',
+            'success': True
+        }), 200
+    
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'success': False
+        }), 500

@@ -35,7 +35,6 @@ class Interaction(db.Model):
             'review_text': review_text,
             'created_at': datetime.utcnow()
         })
-        #new_id = result.fetchone()['id']
         new_id = result.fetchone()[0]
         db.session.commit()
         return new_id

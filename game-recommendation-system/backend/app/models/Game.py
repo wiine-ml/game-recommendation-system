@@ -1,5 +1,5 @@
 from datetime import timezone
-from sqlalchemy import or_, text
+from sqlalchemy import desc, or_, text
 from database import db
 from .Interaction import Interaction
 
@@ -155,7 +155,6 @@ class Game(db.Model):
         ).order_by(
             db.desc('subscribed_count')  # 按关注者数量降序排序
         )
-
         # 分页
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         return pagination
@@ -194,4 +193,18 @@ class Game(db.Model):
     def get_game_by_title(title):
         """根据游戏名称获取游戏"""
         return Game.query.filter_by(gameTitle=title).first()
+    
+    @staticmethod
+    def get_recently_updated_games(page=1, per_page=10):
+        """获取最近更新的游戏分页列表"""
+        # 查询所有游戏，并按发布日期排序（假设发布日期由 releaseYear, releaseMonth, releaseDay 组成）
+        query = Game.query.order_by(
+            desc(Game.releaseYear),
+            desc(Game.releaseMonth),
+            desc(Game.releaseDay)
+        )
+
+        # 分页
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        return pagination
         

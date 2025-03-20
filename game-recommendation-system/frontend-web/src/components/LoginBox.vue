@@ -42,6 +42,7 @@
 
 <script>
 import RegistrationBox from './RegistrationBox.vue'
+import { mapActions } from 'vuex'
 
 export default {
   data() {
@@ -52,6 +53,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions('user', ['fetchAvatar']),
     async submit() {
       try {
         if (this.loginType === 'user') {
@@ -90,6 +92,14 @@ export default {
       } catch (err) {
         console.log('登录失败', err)
         alert('登录失败，请检查用户名或密码！')
+      } finally {
+        if (this.isLogin) {
+          this.fetchAvatar().then((response) => {
+            if (response.success) {
+              this.$store.commit('user/setAvatarFile', response.data.avatarFile)
+            }
+          })
+        }
       }
     },
     Switch2Register() {

@@ -17,24 +17,16 @@ def get_user_interaction_matrix():
     """获取所有的交互矩阵信息，包括显式评分和隐式行为的权重"""
     # 获取所有交互记录，初始化用户交互矩阵
     interactions = Interaction.get_all()
-    user_ids = set()
-    game_ids = set()
-    for interaction in interactions:
-        user_ids.add(interaction.user_id)
-        game_ids.add(interaction.game_id)
+    user_ids = {interaction.user_id for interaction in interactions}
+    game_ids = {interaction.game_id for interaction in interactions}
 
-    user_interaction_matrix = {}
-    for user_id in user_ids:
-        user_interaction_matrix[user_id] = {}
-        for game_id in game_ids:
-            user_interaction_matrix[user_id][game_id] = 0.0
+    user_interaction_matrix = {user_id: {game_id: 0.0 for game_id in game_ids} for user_id in user_ids}
 
     # 遍历交互记录，计算每个用户的每个游戏的综合评分
     for interaction in interactions:
         user_id = interaction.user_id
         game_id = interaction.game_id
         final_score = 0.0
-        
         # 显式评分
         if interaction.review_score != 0.0:
             # 根据评分影响因子调整显式评分
@@ -42,7 +34,6 @@ def get_user_interaction_matrix():
                 if interaction.review_score <= score_range:
                     final_score = interaction.review_score * impact
                     break
-
         # 隐式行为
         implicit_score = 0
         if interaction.clicked:
@@ -52,57 +43,38 @@ def get_user_interaction_matrix():
         if interaction.disliked:
             implicit_score += default_implicit_interaction_score['disliked']
 
-
         # 综合如果没有显式评分，则使用隐式评分
         if final_score == 0.0:
             final_score = implicit_score
-        print(f'用户{user_id}最终评分：{final_score}')
 
         # 更新用户交互矩阵
         user_interaction_matrix[user_id][game_id] = final_score
-
-    for user in user_interaction_matrix:
-        for game in user_interaction_matrix[user]:
-            print(user_interaction_matrix[user][game], end='|')
-        print()
     
     return user_interaction_matrix
 
-def calculate_user_interaction_sparsity():
+
+def calculate_user_interaction_sparsity() -> float:
     """
     计算用户交互矩阵的稀疏性。
-    
     返回:
         sparsity (float): 用户交互矩阵的稀疏性
     """
-    # 获取所有交互记录
     interactions = Interaction.get_all()
-    
-    # 获取所有用户和游戏的数量
     user_num = User.query.count()
     game_num = Game.query.count()
-    
-    # 计算总的可能交互数量
     total_possible_interactions = user_num * game_num
-    
-    # 计算实际的交互数量
     actual_interactions = len(interactions)
-    
-    # 计算稀疏性
     sparsity = actual_interactions / total_possible_interactions
-    
     return sparsity
 
 
 def improved_cosine_similarity(user_interaction_matrix, target_user_id, n=5):
     """
-    基于改进的相似性算法计算与目标用户最相似的用户集。
-    
+    基于改进的相似性算法计算与目标用户最相似的用户集
     参数:
         user_interaction_matrix (dict): 用户交互矩阵，格式为 {user_id: {game_id: final_score}}
         target_user_id (int): 目标用户ID
-        n (int): 返回的相似用户数量，默认为5
-    
+        n (int): 返回的相似用户数量,默认为5
     返回:
         similar_users (list): 与目标用户最相似的用户列表，格式为 [(user_id, similarity)]
     """

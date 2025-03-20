@@ -4,6 +4,7 @@
     <table>
       <thead>
         <tr>
+          <th>游戏图片</th>
           <th>游戏名称</th>
           <th>游戏类型</th>
           <th>游戏平台</th>
@@ -20,6 +21,14 @@
 
       <tbody>
         <tr v-for="(game, index) in currentGames" :key="index">
+          <td>
+            <!-- 游戏图片 -->
+            <img
+              :src="game.previewImage"
+              alt="游戏图片"
+              style="max-width: 100px; max-height: 100px"
+            />
+          </td>
           <td>
             <a href="#" @click.prevent="handleGameTitleClick(game)">
               {{ game.gameTitle || '暂无' }}
@@ -49,18 +58,26 @@
       </tbody>
     </table>
   </div>
+  <!-- 游戏详情弹出层 -->
+  <GameDetail :showDetail="showDetail" :gameDetail="selectedGame" @close-detail="closeDetail" />
 </template>
 
 <script>
 import DataService from '../services/DataService.js'
 import store from '@/services/Store.js'
+import GameDetail from './GameDetail.vue'
 
 export default {
   data() {
     return {
       currentGames: [],
       msg: '',
+      showDetail: false,
+      selectedGame: null,
     }
+  },
+  components: {
+    GameDetail,
   },
   created() {
     this.fetchRecommendations()
@@ -68,7 +85,7 @@ export default {
   methods: {
     async handleGameTitleClick(game) {
       await this.updateInteraction(game, game.isSubscribed, game.isDisliked, true)
-      console.log('Game title clicked:', game)
+      this.showGameDetail(game)
     },
     async toggleSubscribe(game) {
       if (game.isDisliked) {
@@ -91,7 +108,7 @@ export default {
       var oldDisliked = game.isDisliked
       var oldClicked = game.clicked
       try {
-        const response = await DataService.post('/interactions/update', {
+        const response = await DataService.put('/interactions/update', {
           user_id: store.state.user.userID,
           game_id: game.id,
           subscribed: newSubscribed,
@@ -115,16 +132,47 @@ export default {
           },
         })
         this.msg = response.data.msg
-        this.currentGames = response.data.recommendations.map((game) => ({
+
+        // 获取推荐的游戏数据
+        const games = response.data.recommendations.map((game) => ({
           ...game,
           isSubscribed: false,
           isDisliked: false,
+          previewImage: '', // 用于存储预览图片的 URL
         }))
+
+        // 为每个游戏获取预览图片
+        const gamePromises = games.map(async (game) => {
+          try {
+            // 调用接口获取预览图片
+            const imageResponse = await DataService.get(`/games/preview_image/read/${game.id}`, {
+              responseType: 'blob', // 指定响应类型为 blob
+            })
+
+            // 创建图片的 URL
+            game.previewImage = URL.createObjectURL(imageResponse.data)
+          } catch (error) {
+            console.error(`获取游戏 ${game.id} 的预览图片失败:`, error)
+            game.previewImage = 'defaultGameImage.jpg' // 默认图片
+          }
+          return game
+        })
+
+        // 等待所有游戏的图片加载完成
+        this.currentGames = await Promise.all(gamePromises)
         console.log('获取推荐数据成功:', response.data)
       } catch (error) {
         console.error('获取推荐数据失败:', error)
         alert('获取推荐数据失败')
       }
+    },
+    showGameDetail(game) {
+      this.selectedGame = game
+      this.showDetail = true
+    },
+    closeDetail() {
+      this.showDetail = false
+      this.selectedGame = null
     },
   },
 }

@@ -3,6 +3,7 @@
     <table>
       <thead>
         <tr>
+          <th>游戏图片</th>
           <th>游戏名称</th>
           <th>游戏类型</th>
           <th>游戏平台</th>
@@ -19,6 +20,15 @@
 
       <tbody>
         <tr v-for="(game, index) in currentGames" :key="index">
+          <td>
+            <!-- 游戏图片 -->
+            <img
+              id="game-img"
+              :src="game.previewImage"
+              alt="游戏图片"
+              style="max-width: 100px; max-height: 100px"
+            />
+          </td>
           <td>
             <!-- 游戏名称作为链接 -->
             <a href="#" @click.prevent="handleGameTitleClick(game)">
@@ -163,25 +173,56 @@ export default {
           user_id: store.state.user.userID,
         }
 
-        if (this.activeMainContent === '关注') {
-          url = '/games/read/subscribed/page/' + this.currentPage
-        } else if (this.activeMainContent === '最高评分') {
-          url = '/games/read/top_rated/page/' + this.currentPage
-        } else if (this.activeMainContent === '最受欢迎') {
-          url = '/games/read/top_subscribed/page/' + this.currentPage
-        } else {
-          url = `/games/read/page/${this.currentPage}`
-          params.type = this.activeMainContent
+        switch (this.activeMainContent) {
+          case '关注':
+            url = '/games/read/subscribed/page/' + this.currentPage
+            break
+          case '最高评分':
+            url = '/games/read/top_rated/page/' + this.currentPage
+            break
+          case '最受欢迎':
+            url = '/games/read/top_subscribed/page/' + this.currentPage
+            break
+          case '最新上架':
+            url = '/games/read/recently/page/' + this.currentPage
+            break
+          default:
+            url = `/games/read/page/${this.currentPage}`
+            params.type = this.activeMainContent
+            break
         }
 
         const response = await DataService.get(url, { params })
         const responseData = response.data
 
-        this.currentGames = responseData.data.games.map((game) => ({
+        // 获取每页的游戏数据
+        console.log('Response Data:', responseData)
+        const games = responseData.data.games.map((game) => ({
           ...game,
           isSubscribed: game.subscribed,
           isDisliked: game.disliked,
+          previewImage: '', // 用于存储预览图片的 URL
         }))
+
+        // 为每个游戏获取预览图片
+        const gamePromises = games.map(async (game) => {
+          try {
+            // 调用接口获取预览图片
+            const imageResponse = await DataService.get(`/games/preview_image/read/${game.id}`, {
+              responseType: 'blob', // 指定响应类型为 blob
+            })
+
+            // 创建图片的 URL
+            game.previewImage = URL.createObjectURL(imageResponse.data)
+          } catch (error) {
+            console.error(`获取游戏 ${game.id} 的预览图片失败:`, error)
+            game.previewImage = 'defaultGameImage.jpg' // 默认图片
+          }
+          return game
+        })
+
+        // 等待所有游戏的图片加载完成
+        this.currentGames = await Promise.all(gamePromises)
         this.totalPages = responseData.data.totalPages
       } catch (error) {
         console.error('获取游戏数据失败:', error)
@@ -216,6 +257,7 @@ export default {
       this.showDetail = true
     },
     closeDetail() {
+      console.log('close detail')
       this.showDetail = false
       this.selectedGame = null
     },
@@ -264,6 +306,10 @@ export default {
 </script>
 
 <style scoped>
+#game-img {
+  border-radius: 5%;
+}
+
 .subscribed-btn,
 .dislike-btn {
   width: 30px;

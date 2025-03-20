@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from ..models import Interaction, Game
-from ..utils.collaborative_filtering import get_user_interaction_matrix, improved_cosine_similarity, generate_game_recommendations
+from ..utils.user_based_CF import get_user_interaction_matrix, improved_cosine_similarity, generate_game_recommendations
 
 recommendation_bp = Blueprint('recommendation_api', __name__)
 

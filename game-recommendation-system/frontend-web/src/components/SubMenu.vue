@@ -26,6 +26,7 @@ export default {
       activeItem: null,
       menuItemMap: {
         首页: [
+          { text: '热门', link: 'hot' },
           { text: '公告', link: 'noice' },
           { text: '关于', link: 'contact' },
           { text: '设置', link: 'settings' },

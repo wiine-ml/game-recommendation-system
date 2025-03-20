@@ -18,6 +18,7 @@ import ManageCreate from './ManageCreate.vue'
 import ManageUpdate from './ManageUpdate.vue'
 import ManageDelete from './ManageDelete.vue'
 import ContentAccountInfo from './ContentAccountInfo.vue'
+import ContentCarouselPromote from './ContentCarouselPromote.vue'
 
 export default {
   props: {
@@ -33,6 +34,7 @@ export default {
     ContentRecommendation,
     ContentSetting,
     ContentAccountInfo,
+    ContentCarouselPromote,
 
     ManageShow,
     ManageCreate,
@@ -45,6 +47,8 @@ export default {
         //用户内容
         switch (this.activeMainContent) {
           // 首页内容
+          case '热门':
+            return ContentCarouselPromote
           case '公告':
             return ContentNoitce
           case '关于':
