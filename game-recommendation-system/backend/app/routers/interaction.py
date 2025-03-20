@@ -20,6 +20,8 @@ def read_user():
     subscribed_count = sum(1 for interaction in interactions if interaction.subscribed)
     # 统计评论数（评论分数不为空）
     review_count = sum(1 for interaction in interactions if interaction.review_score != 0)
+
+    print(subscribed_count, review_count)
     
     return jsonify({
         'data':{

@@ -6,9 +6,9 @@
       <div class="user-info-content">
         <div class="info-row" v-if="this.$store.getters.currentLoginType === 'user'">
           <span class="info-label">关注</span>
-          <span class="info-value">{{ userInfo.subscribed_count }}</span>
+          <span class="info-value">{{ userInfo.subscribed_count || -1 }}</span>
           <span class="info-label">评论</span>
-          <span class="info-value">{{ userInfo.review_count }}</span>
+          <span class="info-value">{{ userInfo.review_count || -1 }}</span>
         </div>
         <div class="info-row">
           <button class="exit-button" @click="logout">退出登陆</button>
@@ -60,10 +60,13 @@ export default {
               user_id: store.state.user.userID,
             },
           })
-          this.userInfo = response.data
-          this.showInfoPanel = true
+          console.log('获取用户信息成功:', response.data)
+          this.userInfo.review_count = response.data.data.review_count
+          this.userInfo.subscribed_count = response.data.data.subscribed_count
         } catch (error) {
           console.error('获取用户信息失败:', error)
+        } finally {
+          this.showInfoPanel = true
         }
       }, 300)
     },
@@ -72,7 +75,6 @@ export default {
         clearTimeout(this.hoverTimeout)
         this.hoverTimeout = null
       }
-
       this.hideTimeout = setTimeout(() => {
         this.showInfoPanel = false
       }, 300)
@@ -80,6 +82,7 @@ export default {
     logout() {
       this.$store.dispatch('user/logout')
       this.$store.dispatch('admin/logout')
+      this.$store.dispatch('vendor/logout')
       this.$store.commit('preference/clearPreferences')
       this.showInfoPanel = false
       alert('退出登录成功')

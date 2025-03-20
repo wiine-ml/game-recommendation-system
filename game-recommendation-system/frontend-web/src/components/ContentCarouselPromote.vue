@@ -1,4 +1,5 @@
 <template>
+  <h1>热门游戏</h1>
   <div class="carousel-container">
     <div class="carousel">
       <button class="carousel-button prev" @click="prevImage">&lt;</button>

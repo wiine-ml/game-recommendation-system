@@ -3,6 +3,9 @@ from sqlalchemy import desc, or_, text
 from database import db
 from .Interaction import Interaction
 
+from .Developer import game_developers
+from .Publisher import game_publishers
+
 class Game(db.Model):
     __tablename__ = 'games'
 
@@ -19,10 +22,28 @@ class Game(db.Model):
     rating = db.Column(db.Float, default=0)  # 评分
     officalRating = db.Column(db.Float, nullable=True)  # 官方评分
     gameUrl = db.Column(db.String(200), nullable=True)  # 游戏链接
-    gameDeveloper = db.Column(db.String(100), nullable=True)  # 游戏开发商
-    gamePublisher = db.Column(db.String(100), nullable=True)  # 游戏发行商
     gameImage = db.Column(db.String(200), nullable=True)  # 游戏图片
 
+
+    developer_id = db.Column(db.Integer, db.ForeignKey('developers.DeveloperID'), nullable=True)#开发商
+    publisher_id = db.Column(db.Integer, db.ForeignKey('publishers.PublisherID'), nullable=True)#发行商
+
+    gameDescription = db.Column(db.Text, nullable=True)  # 游戏描述
+
+
+    # 与开发商和发行商的多对多关系
+    developers = db.relationship(
+        'Developer',
+        secondary=game_developers,
+        back_populates='games',
+        lazy='select'
+    )
+    publishers = db.relationship(
+        'Publisher',
+        secondary=game_publishers,
+        back_populates='games',
+        lazy='select'
+    )
     interactions = db.relationship('Interaction', backref='game', lazy='dynamic')  # 与交互表的关联关系
 
     def __init__(self, gameTitle, gameGenre, gamePlatform, releaseYear, releaseMonth, releaseDay, gamePhrase=None, followers=None, rating=None, officalRating=None, gameDeveloper=None, gamePublisher=None, gameUrl=None, gameImage=None):

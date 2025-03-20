@@ -1,7 +1,7 @@
 <template>
   <!-- 顶部菜单栏 -->
   <div class="top-menu-container">
-    <TopMenu :activeTopMenu="activeTopMenu" @updataSubMenu="UpdateSubMenu" />
+    <TopMenu @updataSubMenu="UpdateSubMenu" />
   </div>
   <!-- 中间内容区 -->
   <div class="middle-container">
@@ -65,7 +65,8 @@ export default {
     },
   },
   mounted() {
-    // 在应用挂载时加载上次使用设置
+    console.log('登陆状态:' + this.$store.getters.isLogin)
+
     this.$store.dispatch('preference/loadThemeFromStorage')
     this.$store.dispatch('preference/loadItemPerpageFromStorage')
     if (this.isLogin) {
@@ -75,10 +76,12 @@ export default {
         }
       })
     }
-    if (this.$store.getters.currentLoginType === 'user') {
-      this.activeSubMenu = '首页'
+    if (this.$store.getters.currentLoginType === 'admin') {
+      this.activeSubMenu = '公告管理'
+      this.activeMainContent = '查询公告'
     } else {
-      this.activeSubMenu = '公告'
+      this.activeSubMenu = '首页'
+      this.activeMainContent = '热门'
     }
   },
 }

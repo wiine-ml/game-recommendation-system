@@ -1,1 +1,1 @@
-from .image_cotroller import *
+from .image_controller import *

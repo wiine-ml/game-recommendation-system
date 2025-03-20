@@ -44,8 +44,8 @@ def read_recommendations():
             "gameTitle": game.gameTitle,
             "gameGenre": game.gameGenre,
             "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
+            "gameDeveloper": game.developers.DeveloperName if game.developers else None,
+            "gamePublisher": game.publishers.PublisherName if game.publishers else None,  # 获取发行商名称
             "followers": subscribed_count,
             "rating": rating_avg,
             "ratingPhrase": game.ratingPhrase,

@@ -17,6 +17,14 @@
             <input type="radio" id="isUser" name="LoginType" value="user" v-model="loginType" />
             <label for="isUser">用户</label>
           </div>
+          <input
+            type="radio"
+            id="isDeveloper"
+            name="LoginType"
+            value="vendor"
+            v-model="loginType"
+          />
+          <label for="isDeveloper">厂商</label>
           <div>
             <input
               type="radio"
@@ -56,9 +64,9 @@ export default {
     ...mapActions('user', ['fetchAvatar']),
     async submit() {
       try {
+        console.log(this.loginType + '开始登录...')
         if (this.loginType === 'user') {
           console.log('用户登录中...')
-          // 用户登录
           const response = await this.$store.dispatch('user/login', {
             emailOrName: this.emailOrName,
             password: this.password,
@@ -71,18 +79,29 @@ export default {
           } else {
             alert('登录失败，请检查用户名或密码！')
           }
-        } else {
-          // 管理员登录
+        } else if (this.loginType === 'admin') {
           console.log('管理员登录中...')
-          console.log(this.emailOrName, this.password, this.loginType)
           const response = await this.$store.dispatch('admin/login', {
             emailOrName: this.emailOrName,
             password: this.password,
-            loginType: this.loginType,
           })
 
           if (response.success) {
             alert('管理员登录成功！')
+            this.$emit('UpdateLoginView', null)
+            location.reload()
+          } else {
+            alert('登录失败，请检查用户名或密码！')
+          }
+        } else if (this.loginType === 'vendor') {
+          console.log('厂商登录中...')
+          const response = await this.$store.dispatch('vendor/login', {
+            emailOrName: this.emailOrName,
+            password: this.password,
+          })
+          console.log(response)
+          if (response.success) {
+            alert('厂商登录成功！')
             this.$emit('UpdateLoginView', null)
             location.reload()
           } else {
@@ -203,7 +222,6 @@ input {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
-  margin-left: 40px;
 }
 
 .radio-group div {
@@ -212,7 +230,6 @@ input {
 }
 
 .radio-group label {
-  margin-left: 5px;
   white-space: nowrap;
   min-width: 90px;
 }

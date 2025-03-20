@@ -1,9 +1,50 @@
 from flask import Blueprint, request, jsonify, send_file
-from ..models import Game, Interaction
-import os
-from PIL import Image
+from ..models import Game, Interaction, Developer, Publisher
 
 game_bp = Blueprint('game_api', __name__)
+
+def construct_game_response(games, user_id=None, include_interaction=True):
+    """构造游戏列表的返回数据"""
+    game_list = []
+    for game in games:
+        # 查询用户与该游戏的交互信息（如果有用户ID参数）
+        interaction = None
+        if user_id and include_interaction:
+            interaction = Interaction.get_by_user_and_game(user_id, game.id)
+
+        # 统计关注者数量和评分平均分
+        subscribed_count = Interaction.get_subscribed_count(game.id)
+        rating_avg = Interaction.get_average_rating(game.id)
+
+        # 构造基础游戏数据
+        game_data = {
+            "id": game.id,
+            "gameTitle": game.gameTitle,
+            "gameGenre": game.gameGenre,
+            "gamePlatform": game.gamePlatform,
+            "gameDeveloper": game.developers.DeveloperName if game.developers else None,
+            "gamePublisher": game.publishers.PublisherName if game.publishers else None,  # 获取发行商名称
+            "followers": subscribed_count if subscribed_count else 0,
+            "rating": round(rating_avg, 2) if rating_avg else 0,
+            "ratingPhrase": game.ratingPhrase,
+            "officalRating": game.officalRating,
+            "releaseYear": game.releaseYear,
+            "releaseMonth": game.releaseMonth,
+            "releaseDay": game.releaseDay,
+            "gameImage": game.gameImage,
+            "gameUrl": game.gameUrl,
+            "gameDescription": game.gameDescription,  # 添加游戏描述字段
+        }
+
+        # 如果需要包含用户交互状态，添加相关字段
+        if include_interaction and user_id:
+            game_data.update({
+                "subscribed": interaction.subscribed if interaction else False,
+                "disliked": interaction.disliked if interaction else False
+            })
+
+        game_list.append(game_data)
+    return game_list
 
 
 @game_bp.route('/api/games/create', methods=['POST'])
@@ -18,11 +59,8 @@ def read_subscribed_game():
     user_id = request.args.get('user_id')
     page_id = int(request.args.get('page_id', 1))  # 当前页码，默认为1
     items_per_page = int(request.args.get('itemPerpage', 10))  # 每页显示的条数，默认为10
-
     if not user_id:
         return jsonify({"error": "缺少用户ID参数"}), 400
-    
-    # 查询用户所有交互记录中 subscribed 为 True 的记录
     interactions = Interaction.query.filter_by(user_id=user_id, subscribed=True).all()
     
     if not interactions:
@@ -37,7 +75,6 @@ def read_subscribed_game():
         per_page=items_per_page, 
         error_out=False
     )
-
     # 获取总页数
     total_pages = games.pages
     current_page = games.page
@@ -46,37 +83,7 @@ def read_subscribed_game():
     if not items:
         return jsonify({"message": "用户没有关注任何游戏"}), 200
     
-    # 构造返回数据
-    game_list = []
-    for game in games:
-        # 查询用户与该游戏的交互信息
-        interaction = Interaction.get_by_user_and_game(user_id, game.id)
-
-        # 统计关注者数量和评分平均分
-        subscribed_count = Interaction.get_subscribed_count(game.id)
-        rating_avg = Interaction.get_average_rating(game.id)
-
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": subscribed_count,
-            "rating": rating_avg,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-
-            "subscribed": interaction.subscribed if interaction else False,  # 用户订阅状态
-            "disliked": interaction.disliked if interaction else False# 用户不喜欢状态
-        }
-        game_list.append(game_data)
+    game_list = construct_game_response(items, user_id=user_id)
     
     return jsonify({
         "games": game_list,
@@ -109,42 +116,8 @@ def read_page_game(page_id):
     total_pages = (total_items + items_per_page - 1) // items_per_page
     games = query.paginate(page=page_id, per_page=items_per_page, error_out=False).items
 
-    # 构造返回数据
-    game_list = []
-    for game in games:
-        # 查询用户与该游戏的交互信息
-        interaction = Interaction.get_by_user_and_game(user_id, game.id)
-
-        # 统计关注者数量和评分平均分
-        subscribed_count = Interaction.get_subscribed_count(game.id)
-        rating_avg = Interaction.get_average_rating(game.id)
-
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": subscribed_count,
-            "rating": rating_avg,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-        }
-
-        # 如果 genre 不是 '查询游戏'，则添加 subscribed 和 disliked 字段
-        if genre != '查询游戏':
-            
-            game_data.update({
-                "subscribed": interaction.subscribed if interaction else False,
-                "disliked": interaction.disliked if interaction else False
-            })
-        game_list.append(game_data)
+    include_interaction = genre != '查询游戏'
+    game_list = construct_game_response(games, user_id=user_id, include_interaction=include_interaction)
     
     return jsonify({
         "data": {
@@ -190,36 +163,7 @@ def read_subscribed_game_paginated(page_id):
         return jsonify({"message": "用户没有关注任何游戏"}), 200
     
     # 构造返回数据
-    game_list = []
-    for game in items:
-        # 查询用户与该游戏的交互信息
-        interaction = Interaction.get_by_user_and_game(user_id, game.id)
-
-        # 统计关注者数量和评分平均分
-        subscribed_count = Interaction.get_subscribed_count(game.id)
-        rating_avg = Interaction.get_average_rating(game.id)
-
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": subscribed_count,
-            "rating": rating_avg,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-
-            "subscribed": interaction.subscribed if interaction else False,  # 用户订阅状态
-            "disliked": interaction.disliked if interaction else False  # 用户不喜欢状态
-        }
-        game_list.append(game_data)
+    game_list = construct_game_response(items, user_id=user_id)
     
     return jsonify({
         'data':{
@@ -246,34 +190,9 @@ def read_top_rated_games_paginated(page_id):
     if not games:
         return jsonify({"message": "没有游戏数据"}), 200
 
-    # 构造返回数据
-    game_list = []
-    for game, subscribed_count, rating_avg in games:
-        # 查询用户与该游戏的交互信息（如果有用户ID参数）
-        interaction = None
-        if user_id:
-            interaction = Interaction.get_by_user_and_game(user_id, game.id)
-
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": subscribed_count if subscribed_count else 0,
-            "rating": round(rating_avg, 2) if rating_avg else 0,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-            "subscribed": interaction.subscribed if interaction else False,
-            "disliked": interaction.disliked if interaction else False
-        }
-        game_list.append(game_data)
+    # 提取游戏对象
+    game_objects = [game[0] for game in games]
+    game_list = construct_game_response(game_objects, user_id=user_id)
 
     return jsonify({
         'data': {
@@ -299,34 +218,9 @@ def read_top_subscribed_games_paginated(page_id):
     if not games:
         return jsonify({"message": "没有游戏数据"}), 200
 
-    # 构造返回数据
-    game_list = []
-    for game, subscribed_count, rating_avg in games:
-        # 查询用户与该游戏的交互信息（如果有用户ID参数）
-        interaction = None
-        if user_id:
-            interaction = Interaction.get_by_user_and_game(user_id, game.id)
-
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": subscribed_count if subscribed_count else 0,
-            "rating": round(rating_avg, 2) if rating_avg else 0,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-            "subscribed": interaction.subscribed if interaction else False,
-            "disliked": interaction.disliked if interaction else False
-        }
-        game_list.append(game_data)
+    # 提取游戏对象
+    game_objects = [game[0] for game in games]
+    game_list = construct_game_response(game_objects, user_id=user_id)
 
     return jsonify({
         'data': {
@@ -352,34 +246,8 @@ def read_recently_games_paginated(page_id):
     if not games:
         return jsonify({"message": "没有游戏数据"}), 200
 
-    # 构造返回数据
-    game_list = []
-    for game in games:
-        # 查询用户与该游戏的交互信息（如果有用户ID参数）
-        interaction = None
-        if user_id:
-            interaction = Interaction.get_by_user_and_game(user_id, game.id)
-
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": game.followers,
-            "rating": round(game.rating, 2) if game.rating else 0,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-            "subscribed": interaction.subscribed if interaction else False,
-            "disliked": interaction.disliked if interaction else False
-        }
-        game_list.append(game_data)
+     # 构造返回数据
+    game_list = construct_game_response(games, user_id=user_id)
 
     return jsonify({
         'data': {
@@ -399,22 +267,11 @@ def search_game_by_title(game_title):
         target = Game.get_game_by_title(game_title)
         if not target:
             return jsonify({"error": "游戏未找到"}), 404
+        
+        # 构造返回数据
+        game_data = construct_game_response([target], user_id=user_id)
         return jsonify({
-            "data": {
-                "id": target.id,
-                "gameTitle": target.gameTitle,
-                "gameGenre": target.gameGenre,
-                "gamePlatform": target.gamePlatform,
-                "gameDeveloper": target.gameDeveloper,
-                "gamePublisher": target.gamePublisher,
-                "ratingPhrase": target.ratingPhrase,
-                "officalRating": target.officalRating,
-                "releaseYear": target.releaseYear,
-                "releaseMonth": target.releaseMonth,
-                "releaseDay": target.releaseDay,
-                "gameImage": target.gameImage,
-                "gameUrl": target.gameUrl,
-            },
+            "data": game_data[0] if game_data else {},
             "msg": '查询成功',
             'success': True
         }), 200
@@ -437,33 +294,9 @@ def search_game():
         if not game:
             return jsonify({"error": "游戏未找到"}), 404
 
-        # 查询用户与该游戏的交互信息
-        interaction = Interaction.get_by_user_and_game(user_id, game.id) if user_id else None
-
-        # 统计关注者数量和评分平均分
-        subscribed_count = Interaction.get_subscribed_count(game.id)
-        rating_avg = Interaction.get_average_rating(game.id)
-
         # 构造返回数据
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": subscribed_count,
-            "rating": rating_avg,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-            "subscribed": interaction.subscribed if interaction else False,  # 用户订阅状态
-            "disliked": interaction.disliked if interaction else False  # 用户不喜欢状态
-        }
+        game_list = construct_game_response([game], user_id=user_id)
+        game_data = game_list[0] if game_list else {}
 
         return jsonify({
             "data": game_data,
@@ -490,35 +323,10 @@ def read_top_subscribed_games():
     if not games:
         return jsonify({"message": "没有游戏数据"}), 200
 
-    # 构造返回数据
-    game_list = []
-    for game, subscribed_count, rating_avg in games:
-        # 查询用户与该游戏的交互信息（如果有用户ID参数）
-        user_id = request.args.get('user_id')
-        interaction = None
-        if user_id:
-            interaction = Interaction.get_by_user_and_game(user_id, game.id)
-
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": subscribed_count if subscribed_count else 0,
-            "rating": round(rating_avg, 2) if rating_avg else 0,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-            "subscribed": interaction.subscribed if interaction else False,
-            "disliked": interaction.disliked if interaction else False
-        }
-        game_list.append(game_data)
+    # 提取游戏对象
+    game_objects = [game[0] for game in games]
+    user_id = request.args.get('user_id')
+    game_list = construct_game_response(game_objects, user_id=user_id)
 
     return jsonify({
         "games": game_list,
@@ -541,34 +349,10 @@ def read_top_rated_games():
         return jsonify({"message": "没有游戏数据"}), 200
 
     # 构造返回数据
-    game_list = []
-    for game, subscribed_count, rating_avg in games:
-        # 查询用户与该游戏的交互信息（如果有用户ID参数）
-        user_id = request.args.get('user_id')
-        interaction = None
-        if user_id:
-            interaction = Interaction.get_by_user_and_game(user_id, game.id)
-
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "followers": subscribed_count if subscribed_count else 0,
-            "rating": round(rating_avg, 2) if rating_avg else 0,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-            "subscribed": interaction.subscribed if interaction else False,
-            "disliked": interaction.disliked if interaction else False
-        }
-        game_list.append(game_data)
+    # 提取游戏对象
+    game_objects = [game[0] for game in games]
+    user_id = request.args.get('user_id')
+    game_list = construct_game_response(game_objects, user_id=user_id)
 
     return jsonify({
         "games": game_list,
@@ -586,21 +370,8 @@ def read_game_details(game_id):
             return jsonify({"error": "游戏未找到"}), 404
 
         # 构造返回数据
-        game_data = {
-            "id": game.id,
-            "gameTitle": game.gameTitle,
-            "gameGenre": game.gameGenre,
-            "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.gameDeveloper,
-            "gamePublisher": game.gamePublisher,
-            "ratingPhrase": game.ratingPhrase,
-            "officalRating": game.officalRating,
-            "releaseYear": game.releaseYear,
-            "releaseMonth": game.releaseMonth,
-            "releaseDay": game.releaseDay,
-            "gameImage": game.gameImage,
-            "gameUrl": game.gameUrl,
-        }
+        game_list = construct_game_response([game], user_id=None, include_interaction=False)
+        game_data = game_list[0] if game_list else {}
 
         return jsonify({
             "data": game_data,
@@ -624,7 +395,6 @@ def update_game(game_id):
 def delete_game(game_id):
     """删除游戏"""
     pass
-
 
 
 @game_bp.route('/api/games/rating_distribution/<int:game_id>', methods=['GET'])
@@ -669,3 +439,74 @@ def get_rating_distribution(game_id):
             'error': str(e),
             'success': False
         }), 500
+
+
+@game_bp.route('/api/games/read/by_publisher/page/<int:page_id>', methods=['GET'])
+def read_games_by_publisher_paginated(page_id):
+    """根据游戏发行商查找游戏，并支持分页"""
+    publisher_id = request.args.get('publisher_id')
+    items_per_page = int(request.args.get('itemPerpage', 10))  # 每页显示的条数，默认为10
+    user_id = request.args.get('user_id')  # 可选用户ID，用于获取用户交互状态
+
+    if not publisher_id:
+        return jsonify({"error": "缺少发行商ID参数"}), 400
+
+    # 查询指定发行商的游戏
+    publisher = Publisher.query.get(publisher_id)
+    if not publisher:
+        return jsonify({"message": "发行商未找到"}), 404
+
+    # 获取分页数据
+    pagination = publisher.games.paginate(page=page_id, per_page=items_per_page, error_out=False)
+    games = pagination.items
+    total_pages = pagination.pages
+
+    if not games:
+        return jsonify({"message": "没有游戏数据"}), 200
+
+    # 构造返回数据
+    game_list = construct_game_response(games, user_id=user_id)
+
+    return jsonify({
+        'data': {
+            "games": game_list,
+            "totalPages": total_pages,
+        },
+        'msg': '查询成功',
+        'success': True,
+    }), 200
+
+@game_bp.route('/api/games/read/by_developer/page/<int:page_id>', methods=['GET'])
+def read_games_by_developer_paginated(page_id):
+    """根据游戏开发商查找游戏，并支持分页"""
+    developer_id = request.args.get('developer_id')
+    items_per_page = int(request.args.get('itemPerpage', 10))  # 每页显示的条数，默认为10
+    user_id = request.args.get('user_id')  # 可选用户ID，用于获取用户交互状态
+
+    if not developer_id:
+        return jsonify({"error": "缺少开发商ID参数"}), 400
+
+    # 查询指定开发商的游戏
+    developer = Developer.query.get(developer_id)
+    if not developer:
+        return jsonify({"message": "开发商未找到"}), 404
+
+    # 获取分页数据
+    pagination = developer.games.paginate(page=page_id, per_page=items_per_page, error_out=False)
+    games = pagination.items
+    total_pages = pagination.pages
+
+    if not games:
+        return jsonify({"message": "没有游戏数据"}), 200
+
+    # 构造返回数据
+    game_list = construct_game_response(games, user_id=user_id)
+
+    return jsonify({
+        'data': {
+            "games": game_list,
+            "totalPages": total_pages,
+        },
+        'msg': '查询成功',
+        'success': True,
+    }), 200

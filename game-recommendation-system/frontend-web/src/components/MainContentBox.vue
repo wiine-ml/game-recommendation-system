@@ -122,9 +122,8 @@ export default {
         case '删除用户':
         case '删除管理员':
           return ManageDelete
-        default:
-          return ContentMartix // 或者根据需求处理未知情况
       }
+      return ContentMartix // 或者根据需求处理未知情况
     },
   },
 }

@@ -10,14 +10,7 @@
     </div>
   </nav>
   <nav class="navbar-navigations">
-    <div class="navbar-bottom-left" v-if="this.$store.getters.currentLoginType === 'user'">
-      <a href="#" @click="selectMenu('首页')">首页</a>
-      <a href="#" @click="selectMenu('推荐')">推荐</a>
-      <a href="#" @click="selectMenu('类别')">类别</a>
-      <a href="#" @click="selectMenu('新闻')">新闻</a>
-      <a href="#" @click="selectMenu('我的')">我的</a>
-    </div>
-    <div class="navbar-bottom-left" v-else>
+    <div class="navbar-bottom-left" v-if="this.$store.getters.currentLoginType === 'admin'">
       <a href="#" @click="selectMenu('公告管理')">公告管理</a>
       <a href="#" @click="selectMenu('推荐管理')">推荐管理</a>
       <a href="#" @click="selectMenu('新闻管理')">新闻管理</a>
@@ -31,6 +24,27 @@
         管理员管理</a
       >
     </div>
+    <div
+      class="navbar-bottom-left"
+      v-else-if="
+        this.$store.getters.currentLoginType === 'developer' ||
+        this.$store.getters.currentLoginType === 'publisher'
+      "
+    >
+      <a href="#" @click="selectMenu('首页')">123</a>
+      <a href="#" @click="selectMenu('推荐')">推荐</a>
+      <a href="#" @click="selectMenu('类别')">类别</a>
+      <a href="#" @click="selectMenu('新闻')">新闻</a>
+      <a href="#" @click="selectMenu('我的')">我的</a>
+    </div>
+    <div class="navbar-bottom-left" v-else>
+      <a href="#" @click="selectMenu('首页')">首页</a>
+      <a href="#" @click="selectMenu('推荐')">推荐</a>
+      <a href="#" @click="selectMenu('类别')">类别</a>
+      <a href="#" @click="selectMenu('新闻')">新闻</a>
+      <a href="#" @click="selectMenu('我的')">我的</a>
+    </div>
+
     <div class="navbar-search">
       <div class="search-container" v-if="this.$store.getters.currentLoginType === 'user'">
         <input
@@ -68,7 +82,6 @@ import DataService from '../services/DataService.js'
 import GameDetail from './GameDetail.vue'
 
 export default {
-  props: ['activeTopMenu'],
   components: {
     UserInfoDetail,
     GameDetail,
@@ -164,6 +177,9 @@ export default {
       console.log('suggestions:', this.searchSuggestions.length)
       return this.searchSuggestions.length > 0 && this.searchQuery.length > 0
     },
+  },
+  mounted() {
+    console.log(this.$store.getters.currentLoginType)
   },
 }
 </script>
