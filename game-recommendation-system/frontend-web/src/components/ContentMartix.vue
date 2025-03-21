@@ -13,8 +13,8 @@
           <th>评分</th>
           <th>评分描述</th>
           <th>发行日期</th>
-          <th>关注</th>
-          <th>不喜欢</th>
+          <th v-if="interactable">关注</th>
+          <th v-if="interactable">不喜欢</th>
         </tr>
       </thead>
 
@@ -45,13 +45,13 @@
           <td>
             {{ game.releaseYear + '-' + game.releaseMonth + '-' + game.releaseDay || '暂无' }}
           </td>
-          <td>
+          <td v-if="interactable">
             <!-- 订阅按钮 -->
             <button class="subscribed-btn" @click="toggleSubscribe(game)">
               {{ game.isSubscribed ? '&#128149;' : '&#10084;' }}
             </button>
           </td>
-          <td>
+          <td v-if="interactable">
             <!-- 不喜欢按钮 -->
             <button class="dislike-btn" @click="toggleDislike(game)">
               {{ game.isDisliked ? '&#128545;' : '&#128533;' }}
@@ -89,6 +89,10 @@ export default {
     activeMainContent: {
       type: String,
       required: true,
+    },
+    interactable: {
+      type: Boolean,
+      required: false,
     },
   },
   components: {
@@ -171,6 +175,8 @@ export default {
           page_id: this.currentPage,
           itemPerpage: store.state.preference.itemPerpage,
           user_id: store.state.user.userID,
+
+          developer_id: this.$store.getters['vendor/vendorID'],
         }
 
         switch (this.activeMainContent) {
@@ -185,6 +191,9 @@ export default {
             break
           case '最新上架':
             url = '/games/read/recently/page/' + this.currentPage
+            break
+          case 'vendor':
+            url = 'games/read/by_developer/page/' + this.currentPage
             break
           default:
             url = `/games/read/page/${this.currentPage}`

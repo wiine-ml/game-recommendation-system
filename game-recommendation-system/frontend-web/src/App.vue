@@ -65,20 +65,28 @@ export default {
     },
   },
   mounted() {
-    console.log('登陆状态:' + this.$store.getters.isLogin)
-
     this.$store.dispatch('preference/loadThemeFromStorage')
     this.$store.dispatch('preference/loadItemPerpageFromStorage')
-    if (this.isLogin) {
+    if (this.isLogin && this.$store.getters.currentLoginType === 'user') {
       this.fetchAvatar().then((response) => {
         if (response.success) {
           this.$store.commit('user/setAvatarFile', response.data.avatarFile)
         }
       })
+    } else if (
+      this.$store.getters.currentLoginType === 'publisher' ||
+      this.$store.getters.currentLoginType === 'developer'
+    ) {
+      console.log('获取厂商头像')
+      this.$store.dispatch('vendor/fetchAvatar')
     }
+
     if (this.$store.getters.currentLoginType === 'admin') {
       this.activeSubMenu = '公告管理'
       this.activeMainContent = '查询公告'
+    } else if (this.$store.getters.currentLoginType === 'developer') {
+      this.activeSubMenu = '主页管理'
+      this.activeMainContent = '主页预览'
     } else {
       this.activeSubMenu = '首页'
       this.activeMainContent = '热门'

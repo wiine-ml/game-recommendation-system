@@ -9,17 +9,19 @@ const store = new Vuex.Store({
     user: UserInfoStore,
     admin: AdminInfoStore,
     vendor: VendorInfoStore,
+
     preference: PreferenceStore,
   },
   getters: {
-    isLogin: (state, getters, rootState) => {
+    isLogin: (state, getters) => {
       // 检查是否登录
       console.log('用户登陆:' + getters['user/isLogin'])
       console.log('管理员登陆:' + getters['admin/isLogin'])
       console.log('厂商登陆:' + getters['vendor/isLogin'])
+
       return getters['user/isLogin'] || getters['admin/isLogin'] || getters['vendor/isLogin']
     },
-    currentLoginType: (state, getters, rootState) => {
+    currentLoginType: (state, getters) => {
       // 判断当前登录类型
       if (getters['user/isLogin']) {
         return 'user'

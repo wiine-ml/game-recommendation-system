@@ -39,8 +39,13 @@ export default {
     ...mapGetters('user', ['avatarUrl']),
     userAvatar() {
       // 如果用户已登录且有头像 URL，则返回头像 URL
-      if (store.getters.isLogin && this.avatarUrl) {
+      if (store.getters.currentLoginType === 'user' && store.getters.isLogin && this.avatarUrl) {
         return this.avatarUrl
+      } else if (
+        store.getters.currentLoginType === 'publisher' ||
+        store.getters.currentLoginType === 'developer'
+      ) {
+        return this.$store.getters['vendor/avatarUrl']
       }
       // 如果用户未登录或没有头像 URL，返回默认头像
       return '/default-avatar.png'

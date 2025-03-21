@@ -13,7 +13,7 @@ app = create_app()
 db.init_app(app)
 
 
-from app.routers import test_bp, login_bp, register_bp, notice_bp, game_bp, news_bp, interaction_bp, recommendation_bp, review_bp, user_bp, administrator_bp, autocomplete_bp, game_img_bp
+from app.routers import test_bp, login_bp, register_bp, notice_bp, game_bp, news_bp, interaction_bp, recommendation_bp, review_bp, user_bp, administrator_bp, autocomplete_bp, game_img_bp, vendor_home_page_bp
 
 
 app.register_blueprint(user_bp)
@@ -28,6 +28,7 @@ app.register_blueprint(game_img_bp)
 app.register_blueprint(interaction_bp)
 app.register_blueprint(autocomplete_bp)
 app.register_blueprint(administrator_bp)
+app.register_blueprint(vendor_home_page_bp)
 app.register_blueprint(recommendation_bp)
 
 
@@ -37,4 +38,4 @@ with app.app_context():
 if __name__ == '__main__':
         admin = Admin(app, name='GRS-website', template_mode='bootstrap3')
         setup_views(admin)
-        app.run()
+        app.run(port=5000, debug=True)

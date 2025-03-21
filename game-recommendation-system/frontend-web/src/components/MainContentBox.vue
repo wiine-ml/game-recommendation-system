@@ -19,6 +19,10 @@ import ManageUpdate from './ManageUpdate.vue'
 import ManageDelete from './ManageDelete.vue'
 import ContentAccountInfo from './ContentAccountInfo.vue'
 import ContentCarouselPromote from './ContentCarouselPromote.vue'
+import ErrorHandlingPage from './ErrorHandlingPage.vue'
+import VendorHomePage from './VendorHomePage.vue'
+import VendorHeadImageManage from './VendorHeadImageManage.vue'
+import VendorSetting from './VendorSetting.vue'
 
 export default {
   props: {
@@ -40,6 +44,12 @@ export default {
     ManageCreate,
     ManageUpdate,
     ManageDelete,
+
+    VendorHomePage,
+    VendorHeadImageManage,
+    VendorSetting,
+
+    ErrorHandlingPage,
   },
   methods: {
     getContentItemMap() {
@@ -89,41 +99,66 @@ export default {
             return ContentReview
           case '账号信息':
             return ContentAccountInfo
-          // 默认情况
-          default:
-            return ContentMartix // 或者根据需求处理未知情况
+        }
+      } else if (
+        this.$store.getters.currentLoginType === 'admin' ||
+        this.$store.getters.currentLoginType === 'superAdmin'
+      ) {
+        switch (this.activeMainContent) {
+          //
+          case '查询公告':
+          case '查询新闻':
+          case '查询游戏':
+          case '查询用户':
+          case '查询管理员':
+            return ManageShow
+          //
+          case '创建公告':
+          case '创建新闻':
+          case '创建游戏':
+          case '创建管理员':
+            return ManageCreate
+          //
+          case '更新公告':
+          case '更新新闻':
+          case '更新游戏':
+          case '更新用户':
+          case '更新管理员':
+            return ManageUpdate
+          //
+          case '删除公告':
+          case '删除新闻':
+          case '删除游戏':
+          case '删除用户':
+          case '删除管理员':
+            return ManageDelete
+        }
+      } else if (
+        this.$store.getters.currentLoginType === 'developer' ||
+        this.$store.getters.currentLoginType === 'publisher'
+      ) {
+        switch (this.activeMainContent) {
+          //
+          case '主页预览':
+            return VendorHomePage
+          case '主页插画':
+            return VendorHeadImageManage
+          case '主页推广':
+          case '主页设置':
+            return VendorSetting
+          //
+          case '查询游戏':
+          case '发布游戏':
+          case '更新游戏':
+          case '下架游戏':
+          //
+          case '查询新闻':
+          case '发布新闻':
+          case '更新新闻':
+          case '下架新闻':
         }
       }
-      switch (this.activeMainContent) {
-        //
-        case '查询公告':
-        case '查询新闻':
-        case '查询游戏':
-        case '查询用户':
-        case '查询管理员':
-          return ManageShow
-        //
-        case '创建公告':
-        case '创建新闻':
-        case '创建游戏':
-        case '创建管理员':
-          return ManageCreate
-        //
-        case '更新公告':
-        case '更新新闻':
-        case '更新游戏':
-        case '更新用户':
-        case '更新管理员':
-          return ManageUpdate
-        //
-        case '删除公告':
-        case '删除新闻':
-        case '删除游戏':
-        case '删除用户':
-        case '删除管理员':
-          return ManageDelete
-      }
-      return ContentMartix // 或者根据需求处理未知情况
+      return ErrorHandlingPage
     },
   },
 }

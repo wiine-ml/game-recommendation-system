@@ -22,7 +22,7 @@ def construct_game_response(games, user_id=None, include_interaction=True):
             "gameTitle": game.gameTitle,
             "gameGenre": game.gameGenre,
             "gamePlatform": game.gamePlatform,
-            "gameDeveloper": game.developers.DeveloperName if game.developers else None,
+            "gameDeveloper": game.developers[0].DeveloperName if game.developers else None,
             "gamePublisher": game.publishers.PublisherName if game.publishers else None,  # 获取发行商名称
             "followers": subscribed_count if subscribed_count else 0,
             "rating": round(rating_avg, 2) if rating_avg else 0,

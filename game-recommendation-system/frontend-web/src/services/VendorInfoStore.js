@@ -7,7 +7,7 @@ const VendorInfoStore = {
     isLogin: localStorage.getItem('vendorToken') ? true : false,
     vendorID: localStorage.getItem('vendorID') || -1,
     vendorName: localStorage.getItem('vendorName') || null,
-    vendorType: localStorage.getItem('vendorType') || null, // 新增字段
+    vendorType: localStorage.getItem('vendorType') || null,
     vendorAvatar: localStorage.getItem('vendorAvatar') || null,
     vendorProfile: localStorage.getItem('vendorProfile') || null,
     vendorWebsite: localStorage.getItem('vendorWebsite') || null,
@@ -15,6 +15,8 @@ const VendorInfoStore = {
     address: localStorage.getItem('address') || null,
     contactEmail: localStorage.getItem('contactEmail') || null,
     foundedYear: localStorage.getItem('foundedYear') || null,
+    avatarFile: null, // 存储头像文件
+    avatarUrl: localStorage.getItem('vendorAvatarUrl') || '', // 存储头像预览 URL
   },
   mutations: {
     setToken(state, myToken) {
@@ -33,7 +35,6 @@ const VendorInfoStore = {
       localStorage.setItem('vendorName', name)
     },
     setVendorType(state, type) {
-      // 新增 mutation
       state.vendorType = type
       localStorage.setItem('vendorType', type)
     },
@@ -65,12 +66,26 @@ const VendorInfoStore = {
       state.foundedYear = year
       localStorage.setItem('foundedYear', year)
     },
+    setAvatarFile(state, file) {
+      state.avatarFile = file
+      // 如果有文件，生成预览 URL
+      if (file) {
+        state.avatarUrl = URL.createObjectURL(file)
+      } else {
+        state.avatarUrl = ''
+      }
+      localStorage.setItem('vendorAvatarUrl', state.avatarUrl)
+    },
+    setAvatarUrl(state, url) {
+      state.avatarUrl = url
+      localStorage.setItem('vendorAvatarUrl', url)
+    },
     removeToken(state) {
       state.token = null
       state.isLogin = false
       state.vendorID = -1
       state.vendorName = ''
-      state.vendorType = null // 新增字段重置
+      state.vendorType = null
       state.vendorAvatar = null
       state.vendorProfile = null
       state.vendorWebsite = null
@@ -78,11 +93,12 @@ const VendorInfoStore = {
       state.address = null
       state.contactEmail = null
       state.foundedYear = null
-
+      state.avatarFile = null
+      state.avatarUrl = ''
       localStorage.removeItem('vendorToken')
       localStorage.removeItem('vendorID')
       localStorage.removeItem('vendorName')
-      localStorage.removeItem('vendorType') // 新增字段移除
+      localStorage.removeItem('vendorType')
       localStorage.removeItem('vendorAvatar')
       localStorage.removeItem('vendorProfile')
       localStorage.removeItem('vendorWebsite')
@@ -90,6 +106,7 @@ const VendorInfoStore = {
       localStorage.removeItem('address')
       localStorage.removeItem('contactEmail')
       localStorage.removeItem('foundedYear')
+      localStorage.removeItem('vendorAvatarUrl')
     },
   },
   actions: {
@@ -99,26 +116,25 @@ const VendorInfoStore = {
           emailOrName: credentials.emailOrName,
           password: credentials.password,
         })
-
         console.log(response)
 
-        const token = response?.data?.token
-        const vendorID = response?.data?.vendor?.id
-        const vendorName = response?.data?.vendor?.vendor_name
-        const vendorType = response?.data?.vendor?.vendor_type
-        const vendorAvatar = response?.data?.vendor?.vendor_avatar
-        const vendorProfile = response?.data?.vendor?.vendor_profile
-        const vendorWebsite = response?.data?.vendor?.vendor_website
-        const vendorHeadIllustrations = response?.data?.vendor?.vendor_head_illustrations
-        const address = response?.data?.vendor?.address
-        const contactEmail = response?.data?.vendor?.contact_email
-        const foundedYear = response?.data?.vendor?.founded_year
+        const token = response.data.data.token
+        const vendorID = response.data.data.vendor.id
+        const vendorName = response.data.data.vendor.vendor_name
+        const vendorType = response.data.data.vendor.vendor_type
+        const vendorAvatar = response.data.data.vendor.vendor_avatar
+        const vendorProfile = response.data.data.vendor.vendor_profile
+        const vendorWebsite = response.data.data.vendor.vendor_website
+        const vendorHeadIllustrations = response.data.data.vendor.vendor_head_illustrations
+        const address = response.data.data.vendor.address
+        const contactEmail = response.data.data.vendor.contact_email
+        const foundedYear = response.data.data.vendor.founded_year
 
         commit('setToken', token)
         commit('setIsLogin', true)
         commit('setVendorID', vendorID)
         commit('setVendorName', vendorName)
-        commit('setVendorType', vendorType) // 新增字段设置
+        commit('setVendorType', vendorType)
         commit('setVendorAvatar', vendorAvatar)
         commit('setVendorProfile', vendorProfile)
         commit('setVendorWebsite', vendorWebsite)
@@ -137,12 +153,71 @@ const VendorInfoStore = {
       commit('removeToken')
       return { success: true, msg: 'Vendor Logout successful' }
     },
+    async fetchAvatar({ commit, state }) {
+      try {
+        const response = await apiClient.get('/vendor/avatar/read', {
+          params: { vendor_id: state.vendorID, vendor_type: state.vendorType },
+          responseType: 'blob',
+        })
+
+        //
+        const blob = new Blob([response.data], { type: response.headers['content-type'] })
+        const avatarUrl = URL.createObjectURL(blob)
+        commit('setAvatarUrl', avatarUrl)
+
+        commit('setAvatarUrl', avatarUrl) // 需要添加对应的 mutation
+        console.log('Blob size:' + blob.size)
+        return { success: true }
+      } catch (error) {
+        console.error('Fetch avatar failed:', error)
+        return { success: false }
+      }
+    },
+    async uploadAvatar({ state }, file) {
+      if (!state.isLogin) {
+        return { success: false, msg: 'Vendor not logged in' }
+      }
+      try {
+        const formData = new FormData()
+        formData.append('vendor_id', state.vendorID)
+        formData.append('vendor_type', state.vendorType)
+        formData.append('avatar', file)
+
+        await apiClient.post('/vendor/avatar/set', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          file: file,
+        })
+
+        return { success: true, msg: 'Avatar uploaded successfully' }
+      } catch (error) {
+        console.error('Upload avatar failed:', error)
+        return { success: false, msg: 'Upload avatar failed' }
+      }
+    },
+    async deleteAvatar({ state }) {
+      if (!state.isLogin) {
+        return { success: false, msg: 'Vendor not logged in' }
+      }
+      try {
+        await apiClient.post('/vendor/avatar/delete', {
+          vendor_id: state.vendorID,
+          vendor_type: state.vendorType,
+        })
+
+        return { success: true, msg: 'Avatar deleted successfully' }
+      } catch (error) {
+        console.error('Delete avatar failed:', error)
+        return { success: false, msg: 'Delete avatar failed' }
+      }
+    },
   },
   getters: {
     isLogin: (state) => state.isLogin,
     vendorID: (state) => state.vendorID,
     vendorName: (state) => state.vendorName,
-    vendorType: (state) => state.vendorType, // 新增字段获取
+    vendorType: (state) => state.vendorType,
     vendorAvatar: (state) => state.vendorAvatar,
     vendorProfile: (state) => state.vendorProfile,
     vendorWebsite: (state) => state.vendorWebsite,
@@ -150,6 +225,7 @@ const VendorInfoStore = {
     address: (state) => state.address,
     contactEmail: (state) => state.contactEmail,
     foundedYear: (state) => state.foundedYear,
+    avatarUrl: (state) => state.avatarUrl, // 获取头像预览 URL
   },
 }
 

@@ -177,7 +177,7 @@ def vendor_login():
                     "vendor_website": vendor.DeveloperWebsite if vendor_type == 'developer' else vendor.PublisherWebsite,
                     "address": vendor.Address,
                     "contact_email": vendor.ContactEmail,
-                    "founded_year": vendor.FoundedYear
+                    "founded_year": vendor.FoundedYear,
                 }
             },
             "msg": "登录成功",

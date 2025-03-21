@@ -10,6 +10,7 @@
     </div>
   </nav>
   <nav class="navbar-navigations">
+    <!-- 管理员导航栏 -->
     <div class="navbar-bottom-left" v-if="this.$store.getters.currentLoginType === 'admin'">
       <a href="#" @click="selectMenu('公告管理')">公告管理</a>
       <a href="#" @click="selectMenu('推荐管理')">推荐管理</a>
@@ -24,6 +25,8 @@
         管理员管理</a
       >
     </div>
+
+    <!-- 开发商 or 发行商导航栏 -->
     <div
       class="navbar-bottom-left"
       v-else-if="
@@ -31,12 +34,12 @@
         this.$store.getters.currentLoginType === 'publisher'
       "
     >
-      <a href="#" @click="selectMenu('首页')">123</a>
-      <a href="#" @click="selectMenu('推荐')">推荐</a>
-      <a href="#" @click="selectMenu('类别')">类别</a>
-      <a href="#" @click="selectMenu('新闻')">新闻</a>
-      <a href="#" @click="selectMenu('我的')">我的</a>
+      <a href="#" @click="selectMenu('主页管理')">主页管理</a>
+      <a href="#" @click="selectMenu('游戏管理')">游戏管理</a>
+      <a href="#" @click="selectMenu('新闻管理')">新闻管理</a>
+      <a href="#" @click="selectMenu('消息')">消息</a>
     </div>
+    <!-- 用户导航栏 -->
     <div class="navbar-bottom-left" v-else>
       <a href="#" @click="selectMenu('首页')">首页</a>
       <a href="#" @click="selectMenu('推荐')">推荐</a>
@@ -167,6 +170,10 @@ export default {
         return '欢迎管理员 - ' + this.$store.getters['admin/adminName']
       } else if (this.$store.getters.currentLoginType === 'superAdmin') {
         return '欢迎 超级管理员'
+      } else if (this.$store.getters.currentLoginType === 'developer') {
+        return '欢迎登陆' + this.$store.getters['vendor/vendorName']
+      } else if (this.$store.getters.currentLoginType === 'publisher') {
+        return '欢迎登陆' + this.$store.getters['vendor/vendorName']
       } else {
         console.error('Unknown login type')
       }
@@ -179,7 +186,7 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$store.getters.currentLoginType)
+    console.log(store.getters.currentLoginType)
   },
 }
 </script>

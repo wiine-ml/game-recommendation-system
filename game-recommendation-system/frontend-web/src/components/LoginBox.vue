@@ -110,7 +110,7 @@ export default {
         }
       } catch (err) {
         console.log('登录失败', err)
-        alert('登录失败，请检查用户名或密码！')
+        alert('登录失败，请检查用户名或密码！' + err)
       } finally {
         if (this.isLogin) {
           this.fetchAvatar().then((response) => {

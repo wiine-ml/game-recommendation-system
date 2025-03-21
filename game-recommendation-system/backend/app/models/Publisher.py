@@ -34,4 +34,8 @@ class Publisher(db.Model):
         lazy='dynamic'
     )
 
+    @staticmethod
+    def get_publisher_by_id(publisher_id):
+        return Publisher.query.filter_by(PublisherID=publisher_id).first()
+
     

@@ -18,6 +18,7 @@ class Developer(db.Model):
     DeveloperAvatar = db.Column(db.String(255), nullable=True)#开发商头像路径
     DeveloperProfile = db.Column(db.Text, nullable=True)#开发商简介
     DeveloperWebsite = db.Column(db.String(255), nullable=True)#开发商网站
+    
     DeveloperHeadIllustrations = db.Column(db.String(255), nullable=True)#开发商头图
 
     DeveloperPassword = db.Column(db.String(255), nullable=True)
@@ -33,3 +34,7 @@ class Developer(db.Model):
         back_populates='developers',
         lazy='dynamic'
     )
+
+    @staticmethod
+    def get_developer_by_id(developer_id):
+        return Developer.query.filter_by(DeveloperID=developer_id).first()

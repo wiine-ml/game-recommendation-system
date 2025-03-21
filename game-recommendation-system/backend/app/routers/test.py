@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, redirect, url_for
 
 
 test_bp = Blueprint('test_api', __name__)
@@ -23,3 +23,6 @@ def connectivity_testing():
         }
         return jsonify(response), 500
     
+@test_bp.route('/')
+def index():
+    return redirect(url_for('admin.index'))

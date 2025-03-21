@@ -59,7 +59,6 @@ export default {
           { text: '手机游戏', link: '#' },
         ],
         我的: [
-          //{ text: '消息', link: '#' },
           { text: '关注', link: '#' },
           { text: '我的评分', link: '#' },
           { text: '账号信息', link: '#' },
@@ -72,7 +71,6 @@ export default {
           { text: '删除公告', link: '#' },
         ],
         推荐管理: [
-          //TODO
           { text: '推荐参数', link: '#' },
           { text: '推荐状态', link: '#' },
         ],
@@ -98,6 +96,25 @@ export default {
           { text: '创建管理员', link: '#' },
           { text: '更新管理员', link: '#' },
           { text: '删除管理员', link: '#' },
+        ],
+        //vendor
+        主页管理: [
+          { text: '主页预览', link: '#' },
+          { text: '主页插画', link: '#' },
+          { text: '主页推广图', link: '#' },
+          { text: '主页设置', link: '#' },
+        ],
+        厂商游戏管理: [
+          { text: '查询游戏', link: '#' },
+          { text: '创建游戏', link: '#' },
+          { text: '更新游戏', link: '#' },
+          { text: '删除游戏', link: '#' },
+        ],
+        厂商新闻管理: [
+          { text: '查询新闻', link: '#' },
+          { text: '创建新闻', link: '#' },
+          { text: '更新新闻', link: '#' },
+          { text: '删除新闻', link: '#' },
         ],
       },
     }
