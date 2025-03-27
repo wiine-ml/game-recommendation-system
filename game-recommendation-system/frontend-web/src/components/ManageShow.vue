@@ -172,7 +172,7 @@ export default {
           console.error(`未知的数据类型: ${this.activeMainContent}`)
           return
         }
-        let path = '/' + config.path + '/page/' + this.currentPage
+        let path = '/' + config.path + '/read/page/' + this.currentPage
         const params = {
           itemPerpage: this.itemsPerPage,
           type: this.activeMainContent,
@@ -181,9 +181,15 @@ export default {
         console.log(`获取${this.activeMainContent}数据成功:`, response)
 
         // 格式化数据
-        this.currentData = response.data.data.map((item) => {
-          return this.formatData(item)
-        })
+        if (this.activeMainContent === '查询游戏') {
+          this.currentData = response.data.data.games.map((item) => {
+            return this.formatData(item)
+          })
+        } else if (this.activeMainContent === '查询新闻') {
+          this.currentData = response.data.data.map((item) => {
+            return this.formatData(item)
+          })
+        }
 
         this.totalPages = response.data.totalPages
       } catch (error) {

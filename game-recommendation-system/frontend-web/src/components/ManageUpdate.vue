@@ -257,7 +257,7 @@ export default {
     async fetchData() {
       try {
         if (!this.id) {
-          console.error('缺少数据ID')
+          console.log('缺少数据ID')
           return
         }
         const path = `${this.apiPath}/${this.id}`
@@ -296,7 +296,7 @@ export default {
         return
       }
       try {
-        const path = `${this.apiPath}/${this.inputId}`
+        const path = `${this.apiPath}/read/${this.inputId}`
         const response = await DataService.get(path)
         if (response.data.success && response.data.data) {
           this.formData = response.data.data

@@ -106,6 +106,33 @@ export default {
             { field: 'username', label: '用户名' },
           ],
         },
+        //vendor
+        下架游戏: {
+          title: '删除游戏',
+          apiPath: '/games',
+          details: [
+            { field: 'gameTitle', label: '游戏名称' },
+            { field: 'gameGenre', label: '游戏类型' },
+            { field: 'gamePlatform', label: '游戏平台' },
+            { field: 'gameDeveloper', label: '游戏开发商' },
+            { field: 'gamePublisher', label: '游戏发行商' },
+            { field: 'ratingPhrase', label: '游戏评分' },
+            { field: 'officalRating', label: '游戏评价' },
+            { field: 'releaseYear', label: '发行年份' },
+            { field: 'releaseMonth', label: '发行月份' },
+            { field: 'releaseDay', label: '发行日期' },
+            { field: 'gameUrl', label: '游戏链接' },
+          ],
+        },
+        下架新闻: {
+          title: '删除新闻',
+          apiPath: '/news',
+          details: [
+            { field: 'title', label: '标题' },
+            { field: 'description', label: '描述' },
+            { field: 'type', label: '类型' },
+          ],
+        },
       },
       deleteData: null,
       currentTitle: '',
@@ -177,7 +204,7 @@ export default {
         return
       }
       try {
-        const path = `${this.apiPath}/${this.inputId}`
+        const path = `${this.apiPath}/read/${this.inputId}`
         const response = await DataService.get(path)
         if (response.data.success && response.data.data) {
           this.deleteData = response.data.data
@@ -194,7 +221,7 @@ export default {
     },
     async handleDelete() {
       try {
-        const path = `${this.apiPath}/${this.inputId}`
+        const path = `${this.apiPath}/delete/${this.inputId}`
         const response = await DataService.delete(path)
         if (response.data.success) {
           alert('删除成功')

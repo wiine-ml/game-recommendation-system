@@ -3,6 +3,7 @@
     <table>
       <thead>
         <tr>
+          <th v-if="!interactable">游戏ID</th>
           <th>游戏图片</th>
           <th>游戏名称</th>
           <th>游戏类型</th>
@@ -20,6 +21,7 @@
 
       <tbody>
         <tr v-for="(game, index) in currentGames" :key="index">
+          <td v-if="!interactable">{{ game.id }}</td>
           <td>
             <!-- 游戏图片 -->
             <img
@@ -93,6 +95,7 @@ export default {
     interactable: {
       type: Boolean,
       required: false,
+      default: true,
     },
   },
   components: {

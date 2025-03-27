@@ -23,6 +23,7 @@ import ErrorHandlingPage from './ErrorHandlingPage.vue'
 import VendorHomePage from './VendorHomePage.vue'
 import VendorHeadImageManage from './VendorHeadImageManage.vue'
 import VendorSetting from './VendorSetting.vue'
+import VendorPromoteImageManage from './VendorPromoteImageManage.vue'
 
 export default {
   props: {
@@ -47,6 +48,7 @@ export default {
 
     VendorHomePage,
     VendorHeadImageManage,
+    VendorPromoteImageManage,
     VendorSetting,
 
     ErrorHandlingPage,
@@ -74,7 +76,19 @@ export default {
             return ContentRecommendation
           // 类别内容
           case '全部':
-          case '独立':
+          case 'Action':
+          case 'Adventure':
+          case 'Compilation':
+          case 'Educational':
+          case 'Fighting':
+          case 'Platformer':
+          case 'Platform':
+          case 'Puzzle':
+          case 'RPG':
+          case 'Strategy':
+          case 'Simulation':
+          case 'Battle':
+          case 'Card':
           case '动作':
           case '冒险':
           case '休闲':
@@ -144,18 +158,27 @@ export default {
           case '主页插画':
             return VendorHeadImageManage
           case '主页推广':
+            return VendorPromoteImageManage
           case '主页设置':
             return VendorSetting
           //
           case '查询游戏':
-          case '发布游戏':
+            return ManageShow
+          case '上架游戏':
+            return ManageCreate
           case '更新游戏':
+            return ManageUpdate
           case '下架游戏':
+            return ManageDelete
           //
           case '查询新闻':
+            return ManageShow
           case '发布新闻':
+            return ManageCreate
           case '更新新闻':
+            return ManageUpdate
           case '下架新闻':
+            return ManageDelete
         }
       }
       return ErrorHandlingPage

@@ -3,9 +3,12 @@
     <div class="navbar-state">
       <img src="/favicon.ico" alt="Logo" />
     </div>
+
     <div class="navbar-avatar">
       <p v-if="isLogin">{{ welcomeMessage }}</p>
       <p v-else>暂未登录</p>
+      <!-- 邮件按钮，点击后显示 MailBox -->
+      <button id="mail-btn" @click="toggleMailBox" class="mail-button">✉️</button>
       <UserInfoDetail v-if="isLogin" />
     </div>
   </nav>
@@ -35,9 +38,12 @@
       "
     >
       <a href="#" @click="selectMenu('主页管理')">主页管理</a>
-      <a href="#" @click="selectMenu('游戏管理')">游戏管理</a>
-      <a href="#" @click="selectMenu('新闻管理')">新闻管理</a>
-      <a href="#" @click="selectMenu('消息')">消息</a>
+      <a href="#" @click="selectMenu('厂商游戏管理')"
+        >{{ this.$store.getters['vendor/vendorName'] }}游戏管理</a
+      >
+      <a href="#" @click="selectMenu('厂商新闻管理')"
+        >{{ this.$store.getters['vendor/vendorName'] }}新闻管理</a
+      >
     </div>
     <!-- 用户导航栏 -->
     <div class="navbar-bottom-left" v-else>
@@ -76,6 +82,7 @@
   </nav>
 
   <GameDetail :showDetail="showDetail" :gameDetail="selectedGame" @close-detail="closeDetail" />
+  <MailBox :showMailBox="showMailBox" @close="closeMailBox" />
 </template>
 
 <script>
@@ -83,11 +90,13 @@ import store from '../services/Store.js'
 import UserInfoDetail from './UserInfoDetail.vue'
 import DataService from '../services/DataService.js'
 import GameDetail from './GameDetail.vue'
+import MailBox from './MailBox.vue'
 
 export default {
   components: {
     UserInfoDetail,
     GameDetail,
+    MailBox,
   },
   emits: ['updataSubMenu'],
   data() {
@@ -97,6 +106,7 @@ export default {
       debounceTimer: null,
       showDetail: false,
       selectedGame: null,
+      showMailBox: false, // 控制 MailBox 的显示
     }
   },
   methods: {
@@ -158,6 +168,15 @@ export default {
     closeDetail() {
       this.showDetail = false
     },
+    toggleMailBox() {
+      this.showMailBox = !this.showMailBox
+    },
+    openMailBox() {
+      this.$refs.mailBox.openMailBox()
+    },
+    closeMailBox() {
+      this.showMailBox = false
+    },
   },
   computed: {
     isLogin() {
@@ -192,6 +211,22 @@ export default {
 </script>
 
 <style scoped>
+#mail-btn {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  background-color: var(--background-color);
+  border-radius: 10px;
+  font-size: 30px;
+  width: 60px;
+  height: 35px;
+  margin-right: 15px;
+  margin-left: 15px;
+  border: 0px;
+  cursor: pointer;
+}
+
 /* 添加搜索提示的样式 */
 .search-suggestions {
   position: absolute;

@@ -1,6 +1,12 @@
 from flask import Blueprint, request, jsonify
 from ..models import Interaction, Game
+
 from ..utils.user_based_CF import get_user_interaction_matrix, improved_cosine_similarity, generate_game_recommendations
+from ..utils.item_based_CF import get_item_interaction_matrix, calculate_item_similarity, generate_item_recommendations
+
+
+import time  # 用于记录时间
+
 
 recommendation_bp = Blueprint('recommendation_api', __name__)
 
@@ -26,11 +32,52 @@ def read_recommendations():
             'success': True,
             }), 200
 
-    user_interaction_matrix = get_user_interaction_matrix()
-    similar_users = improved_cosine_similarity(user_interaction_matrix, user_id, n=5)
-    recommendations = generate_game_recommendations(user_interaction_matrix, user_id, similar_users, top_n=10)
-    recommended_game_ids = [game_id for game_id, _ in recommendations]
-    recommended_games = Game.query.filter(Game.id.in_(recommended_game_ids)).all()
+    selected_method = 'item_based_CF'
+
+
+    # 开始计算推荐时间
+    start_time = time.time()
+    print(f"开始计算推荐时间: {start_time}")
+
+    if selected_method == 'user_based_CF':
+        #生成推荐
+        user_interaction_matrix = get_user_interaction_matrix()
+        similar_users = improved_cosine_similarity(user_interaction_matrix, user_id, n=5)
+        recommendations = generate_game_recommendations(user_interaction_matrix, user_id, similar_users, top_n=10)
+        recommended_game_ids = [game_id for game_id, _ in recommendations]
+        #通过id获取推荐游戏信息
+        recommended_games = Game.query.filter(Game.id.in_(recommended_game_ids)).all()
+    elif selected_method == 'item_based_CF':
+        # item-based CF 推荐算法
+        # 获取物品交互矩阵
+        item_interaction_matrix = get_item_interaction_matrix()
+
+        # 计算物品相似度矩阵
+        item_similarity_matrix = calculate_item_similarity(item_interaction_matrix)
+
+        # 为用户生成推荐
+        recommendations = generate_item_recommendations(user_id, item_interaction_matrix, item_similarity_matrix, top_n=20, top_k=20)
+
+        # 提取推荐的物品ID
+        recommended_item_ids = [item_id for item_id, _ in recommendations]
+
+        # 通过ID获取推荐游戏信息
+        recommended_games = Game.query.filter(Game.id.in_(recommended_item_ids)).all()
+
+
+    print(type(recommended_games))
+    print(type(recommended_games[0]))
+    print(recommended_games)
+    print('---'*5)
+
+
+
+    # 结束计算推荐时间
+    end_time = time.time()
+    print(f"结束计算推荐时间: {end_time}")
+    # 计算推荐算法计算时长
+    duration = end_time - start_time
+    print(f"推荐算法计算时长: {duration}秒")
 
     # 构造返回数据
     game_list = []

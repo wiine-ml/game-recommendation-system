@@ -145,7 +145,7 @@ button:disabled {
 .message {
   margin-top: 10px;
   padding: 10px;
-  background-color: #f0f0f0;
+  background-color: var(--primary-color);
   border-radius: 4px;
 }
 </style>

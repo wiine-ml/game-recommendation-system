@@ -1,7 +1,16 @@
+from io import BytesIO
 from flask import Blueprint, request, jsonify, send_file
 import os
-from ..models import User, Interaction, Developer, Publisher
+from ..models import User, Interaction, Developer, Publisher, Game, game_developers, game_publishers
 from database import db
+import zipfile
+from ..utils import (
+    construct_image_path,
+    construct_preview_path,
+    check_image_exists,
+    generate_preview_image,
+    get_default_image_path
+)
 
 vendor_home_page_bp = Blueprint('vendor_home_page_api', __name__)
 
@@ -387,3 +396,62 @@ def delete_vendor_avatar():
         }), 400
 
     return jsonify({"msg": "头像删除成功", "success": True}), 200
+
+@vendor_home_page_bp.route('/api/vendor/promoted_image/read', methods=['GET'])
+def read_vendor_promoted_image():
+    """获取厂商推广图片(0-5张)"""
+    try:
+        vendor_id = request.args.get('vendor_id')
+        vendor_type = request.args.get('vendor_type')
+
+        promoted_game_ids = set()
+
+        if vendor_type == 'developer':
+            promoted_developer_games = db.session.query(game_developers).filter_by(is_promoted=True).all()
+            for record in promoted_developer_games:
+                promoted_game_ids.add(record.GameID)
+
+        elif vendor_type == 'publisher':
+            promoted_publisher_games = db.session.query(game_publishers).filter_by(is_promoted=True).all()
+            for record in promoted_publisher_games:
+                promoted_game_ids.add(record.GameID)
+
+        # 根据 GameID 查询游戏对象
+        promoted_games = Game.query.filter(Game.id.in_(promoted_game_ids)).all()
+
+        if not promoted_games:
+            return jsonify({"message": "没有推广游戏数据"}), 200
+
+        # 创建一个内存中的 ZIP 文件
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for game in promoted_games:
+                # 构造图片路径
+                image_filename = game.gameImage if game.gameImage else "defaultGameImage.jpg"
+                image_path = construct_image_path(image_filename)
+                print(f"图片路径: {image_path}")  # 打印图片路径，检查是否正确
+
+                # 检查图片文件是否存在
+                if not check_image_exists(image_path):
+                    # 如果图片不存在，使用默认图片
+                    default_image_path = get_default_image_path()
+                    image_path = default_image_path
+                    print(f"使用默认图片: {image_path}")  # 打印默认图片路径
+
+                # 确保文件名唯一，避免重复
+                base_name = os.path.basename(image_path)
+                unique_name = f"{game.id}_{base_name}"
+                zip_file.write(image_path, unique_name)
+
+        # 准备返回 ZIP 文件
+        zip_buffer.seek(0)
+        return send_file(
+            zip_buffer,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name='promoted_games_images.zip'
+        )
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)}), 500

@@ -1,4 +1,7 @@
 <template>
+  <div class="close-btn" v-if="onPriview">
+    <button>123</button>
+  </div>
   <div class="vendor-home">
     <!-- 顶部厂商信息 -->
     <div class="vendor-header">
@@ -30,6 +33,12 @@ import GameDetail from './GameDetail.vue'
 import DataService from '../services/DataService'
 
 export default {
+  props: {
+    onPriview: {
+      type: Boolean,
+      required: false,
+    },
+  },
   components: {
     ContentMatrix,
     GameDetail,

@@ -36,9 +36,6 @@ apiClient.interceptors.response.use(
   },
 )
 
-//更新拦截器
-
-
 export default apiClient
 
 export const register = (email, username, password) =>

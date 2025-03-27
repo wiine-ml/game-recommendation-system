@@ -1,95 +1,151 @@
 from collections import defaultdict
 import math
 from database import db
-from models import Interaction
+from ..models import Interaction
 
-class ItemBasedCF:
-    def __init__(self):
-        self.user_item_matrix = None
-        self.item_similarity_matrix = None
-        self.items = None
-        self.users = None
+def review_score_normalization(x):
+    '评论分数归一化'
+    return (x - 0.5) / (5 - 0.5)
 
-    def build_user_item_matrix(self):
-        """构建用户-物品矩阵"""
-        interactions = Interaction.get_all()
-        self.users = set()
-        self.items = set()
+def user_interest_value(action: Interaction) -> int:
+    '通过交互记录反应'
+    
+    if action.disliked:
+        return 0
+    
+    res = 0
+
+    if action.clicked: 
+        res += 0.3
+    if action.subscribed:
+        res += 0.6
+    if action.review_score != None and action.review_score != 0:
+        res += review_score_normalization(action.review_score)
+
+    return res
+
+
+def get_item_interaction_matrix():
+    print('生成物品交互矩阵')
+    """
+    获取物品交互矩阵，记录每个物品被哪些用户交互过
+    返回：
+        item_interaction_matrix: 物品交互矩阵，格式为 {item_id: {user_id}}
+    """
+    interactions = Interaction.get_all()
+    item_interaction_matrix = defaultdict(dict)
+    
+    for interaction in interactions:
+        user_id = interaction.user_id
+        item_id = interaction.game_id
+        item_interaction_matrix[item_id][user_id] = user_interest_value(interaction)
         
-        user_item_matrix = defaultdict(dict)
-        
-        for interaction in interactions:
-            user_id = interaction.user_id
-            game_id = interaction.game_id
+    return item_interaction_matrix
+
+def calculate_item_similarity(item_interaction_matrix, similarity_method='cosine'):
+    print('计算物品相似度')
+    """
+    计算物品之间的相似度
+    参数：
+        item_interaction_matrix: 物品交互矩阵
+        similarity_method: 相似度计算方法，可选'cosine'或'iuf'
+    返回：
+        item_similarity_matrix: 物品相似度矩阵，格式为 {item_id: {similar_item_id: similarity_score}}
+    """
+    item_similarity_matrix = defaultdict(dict)
+    
+    # 记录每个物品被多少用户喜欢
+    item_user_count = defaultdict(int)
+    # 记录物品之间的共现次数
+    item_cooccurrence = defaultdict(lambda: defaultdict(int))
+    
+    # 遍历每个物品及其对应的用户
+    for item_id, users in item_interaction_matrix.items():
+        item_user_count[item_id] = len(users)
+        for user in users:
+            for related_item, _ in item_interaction_matrix.items():
+                if related_item == item_id:
+                    continue
+                item_cooccurrence[item_id][related_item] += 1
+    
+    # 计算相似度
+    max_similarity = -1
+    for item_id, related_items in item_cooccurrence.items():
+        for related_item, cooccurrence in related_items.items():
+            if similarity_method == 'cosine':
+                similarity = cooccurrence / (math.sqrt(item_user_count[item_id]) * math.sqrt(item_user_count[related_item]))
+            elif similarity_method == 'iuf':
+                # IUF（Inverse User Frequency）方法，对热门物品的共现进行惩罚
+                similarity = cooccurrence / (math.log(1 + item_user_count[item_id]) * math.log(1 + item_user_count[related_item]))
+            else:
+                similarity = 0.0
+            item_similarity_matrix[item_id][related_item] = similarity
+
+            # 更新最大相似度
+            if similarity > max_similarity:
+                max_similarity = similarity
             
-            self.users.add(user_id)
-            self.items.add(game_id)
-            
-            # 计算用户对物品的兴趣度
-            interest = 0
-            if interaction.clicked:
-                interest += 1
-            if interaction.subscribed:
-                interest += 2
-            if interaction.disliked:
-                interest -= 1
-            if interaction.review_score:
-                interest += interaction.review_score
-            
-            user_item_matrix[user_id][game_id] = interest
+            item_similarity_matrix[item_id][related_item] = similarity
         
-        self.user_item_matrix = user_item_matrix
+        # 归一化处理，将相似度值缩放到0-1之间
+        if max_similarity > 0:
+            for related_item in related_items:
+                item_similarity_matrix[item_id][related_item] /= max_similarity
+        else:
+            # 如果所有相似度都是0，则保持原值
+            for related_item in related_items:
+                item_similarity_matrix[item_id][related_item] = 0.0
 
-    def build_item_similarity_matrix(self):
-        """构建物品相似度矩阵"""
-        if not self.user_item_matrix:
-            self.build_user_item_matrix()
-        
-        # 计算物品之间的共现次数
-        item_count = defaultdict(int)
-        item_sim_matrix = defaultdict(dict)
-        
-        for user, items in self.user_item_matrix.items():
-            for item1 in items:
-                item_count[item1] += 1
-                for item2 in items:
-                    if item1 == item2:
-                        continue
-                    if item2 not in item_sim_matrix[item1]:
-                        item_sim_matrix[item1][item2] = 0
-                    item_sim_matrix[item1][item2] += 1
-        
-        # 计算物品相似度
-        for item1, related_items in item_sim_matrix.items():
-            for item2, count in related_items.items():
-                item_sim_matrix[item1][item2] = count / math.sqrt(item_count[item1] * item_count[item2])
-        
-        self.item_similarity_matrix = item_sim_matrix
 
-    def recommend(self, user_id, top_n=10):
-        """为指定用户生成推荐"""
-        if not self.user_item_matrix or not self.item_similarity_matrix:
-            self.build_user_item_matrix()
-            self.build_item_similarity_matrix()
-        
-        # 获取用户已交互的物品
-        user_items = self.user_item_matrix.get(user_id, {})
-        
-        # 计算推荐分数
-        recommendations = defaultdict(float)
-        for item, score in user_items.items():
-            for related_item, similarity in self.item_similarity_matrix.get(item, {}).items():
-                if related_item not in user_items:
-                    recommendations[related_item] += score * similarity
-        
-        # 按分数排序并返回前N个推荐
-        sorted_recommendations = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)[:top_n]
-        
-        return sorted_recommendations
 
-def recommend_games(user_id, top_n=10):
-    """为用户推荐游戏"""
-    recommender = ItemBasedCF()
-    recommender.build_user_item_matrix()
-    recommender.build_item_similarity_matrix()
-    return recommender.recommend(user_id, top_n)
+    for k, v in item_similarity_matrix.items():
+        print(k, v)
+    
+    return item_similarity_matrix
+
+def generate_item_recommendations(user_id, item_interaction_matrix, item_similarity_matrix, top_n=10, top_k=10):
+    print('生成推荐物品')
+    """
+    为指定用户生成基于物品相似度的推荐
+    参数：
+        user_id: 用户ID
+        item_interaction_matrix: 物品交互矩阵
+        item_similarity_matrix: 物品相似度矩阵
+        top_n: 推荐的物品数量
+        top_k: 为每个用户交互的物品查找的最相似物品数量
+    返回：
+        recommendations: 推荐的物品列表，格式为 [(item_id, recommend_score)]
+    """
+    # 获取用户交互过的物品
+    user_interacted_items = defaultdict(dict)
+    for item_id, users in item_interaction_matrix.items():
+        for user_id in users:
+            user_interacted_items[user_id][item_id] = 1
+
+    user_interacted_items = user_interacted_items.get(user_id, {})
+
+    print(f'user {user_id} interacted items: {user_interacted_items}')
+    
+    recommendations = defaultdict(float)
+    
+    # 遍历用户交互过的每个物品
+    for item in user_interacted_items:
+        # 获取与当前物品最相似的top_k个物品
+        similar_items = sorted(item_similarity_matrix[item].items(), key=lambda x: x[1], reverse=True)[:top_k]
+        for similar_item, similarity in similar_items:
+            # 如果相似物品已经被用户交互过，则跳过
+
+            if similar_item in user_interacted_items:
+                print(f'(similar_item: {similar_item}, similarity: {similarity})', end=' | ')
+                continue
+            # 累加相似度作为推荐分数
+            recommendations[similar_item] += similarity
+        print('----')
+    
+    # 按推荐分数排序并取前top_n个物品
+    recommendations = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)[:top_n]
+
+    print(recommendations)
+    
+    return recommendations
+

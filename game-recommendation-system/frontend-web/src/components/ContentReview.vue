@@ -132,7 +132,7 @@ export default {
 
       this.isLoading = true
       try {
-        const response = await DataService.get('/games/search', {
+        const response = await DataService.get('/games/read/search', {
           params: {
             user_id: store.state.user.userID,
             game_id: this.newReview.game_id,

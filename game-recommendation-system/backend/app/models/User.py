@@ -12,10 +12,10 @@ class User(db.Model):
 
     #用户信息
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(128), unique=True, nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
     username = db.Column(db.String(64), nullable=False)
-    password = db.Column(db.String(256), nullable=False)
-    avatar = db.Column(db.String(256), nullable=True) # 头像路径
+    password = db.Column(db.String(255), nullable=False)
+    avatar = db.Column(db.String(255), nullable=True) # 头像路径
 
     interaction = db.relationship('Interaction', backref='user', lazy=True)
 

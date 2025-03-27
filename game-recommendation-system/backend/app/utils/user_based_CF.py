@@ -1,5 +1,9 @@
 from ..models import Interaction, User, Game
 
+from collections import defaultdict
+import math
+from database import db
+
 score_impact_factor={
     1.0: 0, #用户评分0.0-1.0时,对相似用户减少推荐该游戏的可能，
     2.5: 0.5, #(0.5*score).1f,当用户评分1.0-2.5时,对相似用户推荐该游戏的可能较小，
@@ -124,7 +128,6 @@ def improved_cosine_similarity(user_interaction_matrix, target_user_id, n=5):
     # 按相似度排序，取前n个用户
     similar_users = sorted(similarities.items(), key=lambda x: x[1], reverse=True)[:n]
     
-    print(similar_users)
     return similar_users
 
 
@@ -144,11 +147,9 @@ def generate_game_recommendations(user_interaction_matrix, target_user_id, simil
    
     # 获取目标用户的交互记录
     target_user_interactions = user_interaction_matrix.get(target_user_id, {})
-    print('获取目标用户的交互记录' + str(target_user_interactions))
      
     # 计算目标用户的平均评分
     target_user_avg = sum(target_user_interactions.values()) / len(target_user_interactions) if target_user_interactions else 0.0
-    print('计算目标用户的平均评分' + str(target_user_avg))
 
     # 获取相似用户的ID列表
     similar_user_ids = [user_id for user_id, similarity in similar_users]
@@ -161,8 +162,6 @@ def generate_game_recommendations(user_interaction_matrix, target_user_id, simil
     
     # 遍历相似用户的交互记录，计算预测评分
     for user_id, interactions in similar_users_interactions.items():
-        
-        
         for game_id, score in interactions.items():
             # 如果目标用户已经评分过该游戏，则跳过
             if game_id in target_user_interactions:
