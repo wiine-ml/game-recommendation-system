@@ -1,5 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from ..models import News
+
+import os
+from PIL import Image
 
 
 news_bp = Blueprint('news_api', __name__)
@@ -112,3 +115,43 @@ def delete_news(news_id):
     #TODOs
     pass
 
+
+
+def construct_image_path(image_filename):
+    """构造图片的完整路径"""
+    return os.path.join('images', 'illustrations', image_filename)
+
+def check_image_exists(image_path):
+    """检查图片文件是否存在"""
+    return os.path.exists(image_path)
+
+def get_default_image_path():
+    """获取默认图片的路径"""
+    return os.path.join('images', 'illustrations', 'defaultillustrationsImage.jpg')
+
+@news_bp.route('/api/news/img/read/<int:news_id>', methods=['GET'])
+def read_news_image(news_id):
+    """获取新闻的图片"""
+    try:
+        # 查询新闻是否存在
+        news = News.get_news_by_id(news_id)
+        if not news:
+            return jsonify({"error": "新闻不存在"}), 404
+        
+        # 如果新闻没有设置图片，则使用默认图片
+        image_filename = news.image if news.image else "defaultillustrationsImage.jpg"
+        
+        # 构造图片路径
+        image_path = construct_image_path(image_filename)
+        
+        # 检查图片文件是否存在
+        if not check_image_exists(image_path):
+            # 如果图片不存在，返回默认图片
+            default_image_path = get_default_image_path()
+            return send_file(default_image_path, mimetype='image/jpeg')
+        
+        # 返回图片文件
+        return send_file(image_path, mimetype='image/jpeg')
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)}), 500

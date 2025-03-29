@@ -15,11 +15,11 @@
   <nav class="navbar-navigations">
     <!-- 管理员导航栏 -->
     <div class="navbar-bottom-left" v-if="this.$store.getters.currentLoginType === 'admin'">
-      <a href="#" @click="selectMenu('公告管理')">公告管理</a>
-      <a href="#" @click="selectMenu('推荐管理')">推荐管理</a>
-      <a href="#" @click="selectMenu('新闻管理')">新闻管理</a>
-      <a href="#" @click="selectMenu('游戏管理')">游戏管理</a>
-      <a href="#" @click="selectMenu('用户管理')">用户管理</a>
+      <a href="#公告管理" @click="selectMenu('公告管理')">公告管理</a>
+      <a href="#推荐管理" @click="selectMenu('推荐管理')">推荐管理</a>
+      <a href="#新闻管理" @click="selectMenu('新闻管理')">新闻管理</a>
+      <a href="#游戏管理" @click="selectMenu('游戏管理')">游戏管理</a>
+      <a href="#用户管理" @click="selectMenu('用户管理')">用户管理</a>
       <a
         href="#"
         @click="selectMenu('管理员管理')"
@@ -37,21 +37,21 @@
         this.$store.getters.currentLoginType === 'publisher'
       "
     >
-      <a href="#" @click="selectMenu('主页管理')">主页管理</a>
-      <a href="#" @click="selectMenu('厂商游戏管理')"
+      <a href="#主页管理" @click="selectMenu('主页管理')">主页管理</a>
+      <a href="#厂商游戏管理" @click="selectMenu('厂商游戏管理')"
         >{{ this.$store.getters['vendor/vendorName'] }}游戏管理</a
       >
-      <a href="#" @click="selectMenu('厂商新闻管理')"
+      <a href="#厂商新闻管理" @click="selectMenu('厂商新闻管理')"
         >{{ this.$store.getters['vendor/vendorName'] }}新闻管理</a
       >
     </div>
     <!-- 用户导航栏 -->
     <div class="navbar-bottom-left" v-else>
-      <a href="#" @click="selectMenu('首页')">首页</a>
-      <a href="#" @click="selectMenu('推荐')">推荐</a>
-      <a href="#" @click="selectMenu('类别')">类别</a>
-      <a href="#" @click="selectMenu('新闻')">新闻</a>
-      <a href="#" @click="selectMenu('我的')">我的</a>
+      <a href="#首页" @click="selectMenu('首页')">首页</a>
+      <a href="#推荐" @click="selectMenu('推荐')">推荐</a>
+      <a href="#类别" @click="selectMenu('类别')">类别</a>
+      <a href="#新闻" @click="selectMenu('新闻')">新闻</a>
+      <a href="#我的" @click="selectMenu('我的')">我的</a>
     </div>
 
     <div class="navbar-search">
@@ -242,6 +242,8 @@ export default {
 }
 
 .search-suggestions ul {
+  display: flex;
+  flex-direction: column;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -308,6 +310,7 @@ li {
   background-color: var(--secondary-color);
   color: var(--contrast-color);
   padding: 0.5rem 2rem;
+  margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;

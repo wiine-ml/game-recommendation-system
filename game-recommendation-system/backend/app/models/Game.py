@@ -164,17 +164,18 @@ class Game(db.Model):
     @staticmethod
     def get_top_subscribed_games(page=1, per_page=10):
         """获取根据关注者数量排序的所有游戏，并支持分页"""
-        # 查询所有游戏，并计算每个游戏的关注者数量和评分平均分
+    # 查询所有游戏，并计算每个游戏的关注者数量（subscribed=True）和评分平均分
         query = db.session.query(
             Game,
-            db.func.count(Interaction.id).label('subscribed_count'),
+            db.func.sum(db.case((Interaction.subscribed == True, 1), else_=0)).label('subscribed_count'),
             db.func.avg(Interaction.review_score).label('rating_avg')
         ).outerjoin(
             Interaction, Game.id == Interaction.game_id
         ).group_by(
             Game.id
         ).order_by(
-            db.desc('subscribed_count')  # 按关注者数量降序排序
+            db.desc('subscribed_count'),  # 按关注者数量降序排序
+            db.desc('rating_avg')         # 如果关注者数量相同，按评分平均分降序排序
         )
         # 分页
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)

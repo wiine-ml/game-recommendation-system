@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, send_file
 import os
+from flask_bcrypt import generate_password_hash, check_password_hash
 from ..models import User, Interaction
+from database import db
 
 user_bp = Blueprint('user_api', __name__)
 
@@ -200,3 +202,53 @@ def delete_user():
     """删除用户"""
     pass
 
+@user_bp.route('/api/users/passwor/dupdate', methods=['POST'])
+def update_user_password():
+    """更新用户密码"""
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+
+        # 检查是否提供了必要的参数
+        if not user_id or not old_password or not new_password:
+            return jsonify({
+                "data": {},
+                "msg": "缺少必要的参数",
+                "success": False
+            }), 400
+
+        # 获取用户
+        user = User.get_user_by_id(user_id)
+        if not user:
+            return jsonify({
+                "data": {},
+                "msg": "用户不存在",
+                "success": False
+            }), 404
+
+        # 验证旧密码
+        if not User.check_password(user, old_password):
+            return jsonify({
+                "data": {},
+                "msg": "旧密码不正确",
+                "success": False
+            }), 400
+
+        # 更新密码
+        user.password = generate_password_hash(new_password).decode('utf-8')
+        db.session.commit()
+
+        return jsonify({
+            "data": {},
+            "msg": "密码更新成功",
+            "success": True
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "data": {},
+            "msg": f"密码更新失败: {str(e)}",
+            "success": False
+        }), 500

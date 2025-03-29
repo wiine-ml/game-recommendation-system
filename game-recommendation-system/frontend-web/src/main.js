@@ -19,7 +19,8 @@ const app = createApp(App)
 
 app.config.globalProperties.$axios = axios
 app.config.globalProperties.$echarts = echarts
+app.config.devtools = false
+app.config.productionTip = false
 
 app.use(store)
-
 app.mount('#app')

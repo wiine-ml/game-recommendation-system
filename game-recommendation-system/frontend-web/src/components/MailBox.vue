@@ -9,12 +9,14 @@
         <div v-for="(mail, index) in mails" :key="index" class="mail-item">
           <p>发送者: {{ mail.sender_type }} - {{ mail.sender_id }}</p>
           <p>内容: {{ mail.message }}</p>
-          <button @click="deleteMail(mail.id)">删除</button>
+          <button id="delete-btn" @click="deleteMail(mail.id)">删除</button>
         </div>
       </div>
+
       <div v-else class="empty-mail">
         <p>收件箱空空如也</p>
       </div>
+
       <div class="mail-pagination">
         <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
         <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
@@ -60,12 +62,15 @@ export default {
         return
       }
       try {
-        const response = await apiClient.get(`/mail/read/page/${page}`, {
-          data: {
-            receiver_type: this.receiverType,
-            receiver_id: this.receiverId,
-          },
-        })
+        // 构造查询参数
+        const queryParams = new URLSearchParams({
+          receiver_type: this.receiverType,
+          receiver_id: this.receiverId,
+        }).toString()
+
+        // 发送 GET 请求并包含查询参数
+        const response = await apiClient.get(`/mail/read/page/${page}?${queryParams}`)
+
         if (response.data.success) {
           this.mails = response.data.data.mails
           this.currentPage = response.data.data.current_page
@@ -121,6 +126,19 @@ export default {
 </script>
 
 <style scoped>
+p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#delete-btn {
+  float: right;
+  background-color: #ff2222;
+  color: var(--contrast-color);
+  border-radius: 10px;
+  margin-right: 20px;
+}
+
 .empty-mail {
   padding: 15px;
   text-align: center;
@@ -128,7 +146,7 @@ export default {
 }
 
 #exit-btn {
-  border-radius: 20%;
+  border-radius: 30%;
 }
 
 .mail-box {
@@ -146,10 +164,10 @@ export default {
 
 .mail-box-content {
   background-color: var(--primary-color);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--contrast-color);
+  border-radius: 20px;
+  box-shadow: 0 1px 4px var(--contrast-color);
   width: 80%;
-  max-width: 800px;
+  max-width: 1000px;
 }
 
 .mail-box-header {
@@ -161,18 +179,26 @@ export default {
 }
 
 .mail-list {
-  padding: 15px;
+  padding: 10px;
   max-height: 600px;
   overflow-y: auto;
+  margin-bottom: 10px;
+  border-radius: 20px;
 }
 
 .mail-item {
-  border-bottom: 1px solid #eee;
-  padding: 10px 0;
+  border-top: 1px solid var(--contrast-color);
+  border-bottom: 1px solid var(--contrast-color);
+  padding-bottom: 50px;
+  margin: 10px 20px;
+}
+
+.mail-item:first-child {
+  border-radius: 10px;
 }
 
 .mail-item:last-child {
-  border-bottom: none;
+  border-radius: 10px;
 }
 
 .mail-pagination {
@@ -180,11 +206,9 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 15px;
-  border-top: 1px solid #eee;
 }
 
 button {
-  margin: 0 10px;
   padding: 5px 10px;
   cursor: pointer;
 }

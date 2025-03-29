@@ -15,6 +15,7 @@ recommendation_bp = Blueprint('recommendation_api', __name__)
 def read_recommendations():
     """获取游戏推荐"""
     user_id = request.args.get('user_id')
+    recommendation_type = request.args.get('recommendation_type')
     if not user_id:
         return jsonify({"error": "缺少用户ID参数"}), 400
     
@@ -39,7 +40,8 @@ def read_recommendations():
     start_time = time.time()
     print(f"开始计算推荐时间: {start_time}")
 
-    if selected_method == 'user_based_CF':
+    if recommendation_type == 'user_based_CF':
+        print('-----user_based_CF-----')
         #生成推荐
         user_interaction_matrix = get_user_interaction_matrix()
         similar_users = improved_cosine_similarity(user_interaction_matrix, user_id, n=5)
@@ -47,7 +49,8 @@ def read_recommendations():
         recommended_game_ids = [game_id for game_id, _ in recommendations]
         #通过id获取推荐游戏信息
         recommended_games = Game.query.filter(Game.id.in_(recommended_game_ids)).all()
-    elif selected_method == 'item_based_CF':
+    elif recommendation_type == 'item_based_CF':
+        print('-----item_based_CF-----')
         # item-based CF 推荐算法
         # 获取物品交互矩阵
         item_interaction_matrix = get_item_interaction_matrix()

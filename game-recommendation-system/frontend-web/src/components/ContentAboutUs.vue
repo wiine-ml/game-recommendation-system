@@ -78,9 +78,9 @@ export default {
 }
 
 .content-item {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 20px;
   width: 80%;
   box-sizing: border-box;
 }

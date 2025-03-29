@@ -185,7 +185,7 @@ export default {
     async saveEdit(review) {
       // 保存编辑内容到后端
       try {
-        const response = await DataService.post('/reviews/update', {
+        const response = await DataService.put('/reviews/update', {
           user_id: store.state.user.userID,
           game_id: review.game_id,
           review_score: review.rating,

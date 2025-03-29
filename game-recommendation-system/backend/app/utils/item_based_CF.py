@@ -3,6 +3,8 @@ import math
 from database import db
 from ..models import Interaction
 
+print
+
 def review_score_normalization(x):
     '评论分数归一化'
     return (x - 0.5) / (5 - 0.5)
@@ -26,7 +28,6 @@ def user_interest_value(action: Interaction) -> int:
 
 
 def get_item_interaction_matrix():
-    print('生成物品交互矩阵')
     """
     获取物品交互矩阵，记录每个物品被哪些用户交互过
     返回：
@@ -43,7 +44,6 @@ def get_item_interaction_matrix():
     return item_interaction_matrix
 
 def calculate_item_similarity(item_interaction_matrix, similarity_method='cosine'):
-    print('计算物品相似度')
     """
     计算物品之间的相似度
     参数：
@@ -96,10 +96,6 @@ def calculate_item_similarity(item_interaction_matrix, similarity_method='cosine
             for related_item in related_items:
                 item_similarity_matrix[item_id][related_item] = 0.0
 
-
-
-    for k, v in item_similarity_matrix.items():
-        print(k, v)
     
     return item_similarity_matrix
 
@@ -136,16 +132,12 @@ def generate_item_recommendations(user_id, item_interaction_matrix, item_similar
             # 如果相似物品已经被用户交互过，则跳过
 
             if similar_item in user_interacted_items:
-                print(f'(similar_item: {similar_item}, similarity: {similarity})', end=' | ')
                 continue
             # 累加相似度作为推荐分数
             recommendations[similar_item] += similarity
-        print('----')
     
     # 按推荐分数排序并取前top_n个物品
     recommendations = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)[:top_n]
-
-    print(recommendations)
     
     return recommendations
 

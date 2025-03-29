@@ -8,20 +8,52 @@
       <p v-else>您尚未设置头像</p>
     </div>
 
-    <!-- 上传新头像 -->
-    <div class="upload-avatar">
-      <input type="file" @change="handleFileChange" accept="image/*" ref="fileInput" />
-      <button @click="uploadUserAvatar" :disabled="!selectedFile">上传头像</button>
-    </div>
+    <div class="opreate-area">
+      <!-- 上传新头像 -->
+      <div class="upload-avatar">
+        <input
+          id="file-input"
+          type="file"
+          @change="handleFileChange"
+          accept="image/*"
+          ref="fileInput"
+        />
+      </div>
 
-    <!-- 操作按钮 -->
-    <div class="actions">
-      <button @click="deleteUserAvatar" v-if="hasAvatar">删除头像</button>
+      <!-- 操作按钮 -->
+      <div class="actions">
+        <button @click="uploadUserAvatar" :disabled="!selectedFile">上传头像</button>
+        <button @click="deleteUserAvatar" v-if="hasAvatar">删除头像</button>
+      </div>
     </div>
+  </div>
+  <!-- 操作结果提示 -->
+  <div class="message" v-if="message">
+    {{ message }}
+  </div>
 
-    <!-- 操作结果提示 -->
-    <div class="message" v-if="message">
-      {{ message }}
+  <hr />
+  <div class="password-management">
+    <h2>修改密码</h2>
+    <div class="password-update">
+      <form @submit.prevent="updatePassword">
+        <div class="form-group">
+          <label for="oldPassword">旧密码:</label>
+          <input type="password" id="oldPassword" v-model="oldPassword" required />
+        </div>
+        <div class="form-group">
+          <label for="newPassword">新密码:</label>
+          <input
+            type="password"
+            id="newPassword"
+            v-model="newPassword"
+            required
+            @blur="validatePassword"
+          />
+          <span v-if="passwordError" class="error">{{ passwordError }}</span>
+        </div>
+        <button id="update-btn" type="submit" :disabled="isSubmitting">更新密码</button>
+      </form>
     </div>
   </div>
 </template>
@@ -99,8 +131,36 @@ export default {
 </script>
 
 <style scoped>
-.avatar-management {
-  max-width: 600px;
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin: 10px 40px;
+}
+
+.opreate-area {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+}
+
+#file-input {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background-color: var(--primary-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 10px;
+  padding: 8px;
+  margin: 10px;
+}
+
+.avatar-management,
+.password-management {
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -116,20 +176,16 @@ export default {
 }
 
 .upload-avatar {
-  margin: 20px 0;
-}
-
-.actions {
-  margin: 20px 0;
+  margin: 10px;
 }
 
 button {
-  margin: 0 10px;
-  padding: 8px 16px;
+  margin: 5px;
+  padding: 10px 20px;
   background-color: var(--main-color);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -140,12 +196,5 @@ button:hover {
 button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
-}
-
-.message {
-  margin-top: 10px;
-  padding: 10px;
-  background-color: var(--primary-color);
-  border-radius: 4px;
 }
 </style>

@@ -68,6 +68,13 @@ import store from '@/services/Store.js'
 import GameDetail from './GameDetail.vue'
 
 export default {
+  props: {
+    recommendationType: {
+      type: String,
+      required: false,
+      default: 'item_based_CF',
+    },
+  },
   data() {
     return {
       currentGames: [],
@@ -129,6 +136,7 @@ export default {
         const response = await DataService.get('/recommendations/read', {
           params: {
             user_id: store.state.user.userID,
+            recommendation_type: this.recommendationType,
           },
         })
         this.msg = response.data.msg
@@ -219,22 +227,24 @@ export default {
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  text-align: center;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  border: solid 2px var(--contrasr-color);
   margin: 0 auto;
 }
 
 tbody {
-  border-top: 5px solid var(--secondary-color);
-  border-bottom: 1px solid var(--secondary-color);
+  border-top: 3px solid var(--secondary-color);
+  border-bottom: 3px solid var(--secondary-color);
   margin: 10px 0;
 }
-
 th,
 td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid var(--secondary-color);
-  border-radius: 5px;
 }
 
 th {
@@ -263,5 +273,26 @@ tr:nth-child(odd):hover {
 
 a {
   color: var(--main-color);
+}
+
+table tr th:first-child,
+table tr td:first-child {
+  border-left: 2px solid var(--primary-color); /* 给table设置左边框 */
+}
+table tr th:last-child,
+table tr td:last-child {
+  border-right: 2px solid var(--primary-color); /* 给table设置右边框 */
+}
+table tr:first-child th:first-child {
+  border-top-left-radius: 10px; /* 设置table左上圆角 */
+}
+table tr:first-child th:last-child {
+  border-top-right-radius: 10px; /* 设置table右上圆角 */
+}
+table tr:last-child td:first-child {
+  border-bottom-left-radius: 10px; /* 设置table左下圆角 */
+}
+table tr:last-child td:last-child {
+  border-bottom-right-radius: 10px; /* 设置table右下圆角 */
 }
 </style>

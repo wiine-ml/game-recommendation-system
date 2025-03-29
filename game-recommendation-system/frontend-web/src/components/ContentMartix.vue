@@ -39,8 +39,16 @@
           </td>
           <td>{{ game.gameGenre || '暂无' }}</td>
           <td>{{ game.gamePlatform || '暂无' }}</td>
-          <td>{{ game.gameDeveloper || '暂无' }}</td>
-          <td>{{ game.gamePublisher || '暂无' }}</td>
+          <td>
+            <a href="#" @click.prevent="showVendorHomePage(game.gameDeveloperId)">
+              {{ game.gameDeveloper || '暂无' }}
+            </a>
+          </td>
+          <td>
+            <a href="#" @click.prevent="showVendorHomePage(game.gamePublisherId)">
+              {{ game.gamePublisher || '暂无' }}
+            </a>
+          </td>
           <td>{{ game.followers || 0 }}</td>
           <td>{{ game.rating || 0 }}</td>
           <td>{{ game.ratingPhrase || '暂无' }}</td>
@@ -64,8 +72,9 @@
     </table>
 
     <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
+      <button id="page-btn" @click="prevPage" :disabled="currentPage === 1">上一页</button>
       <button
+        id="page-btn"
         v-for="page in visiblePagesIndex"
         :key="page"
         @click="goToPage(page)"
@@ -73,7 +82,7 @@
       >
         {{ page }}
       </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+      <button id="page-btn" @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
     </div>
   </div>
 
@@ -318,8 +327,9 @@ export default {
 </script>
 
 <style scoped>
+#page-btn,
 #game-img {
-  border-radius: 5%;
+  border-radius: 10px;
 }
 
 .subscribed-btn,

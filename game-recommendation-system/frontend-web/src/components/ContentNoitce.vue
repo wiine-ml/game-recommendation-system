@@ -4,7 +4,7 @@
       <li v-for="(item, index) in currentNotices" :key="index" class="content-item">
         <div class="header">
           <div class="avatar">
-            <img :src="item.avatar" alt="/public/guest.jpg" />
+            <img src="/defaultUserImg.jpg" alt="/public/guest.jpg" />
           </div>
           <div class="username">{{ item.username }}</div>
         </div>
@@ -16,8 +16,9 @@
     </ul>
 
     <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
+      <button id="page-btn" @click="prevPage" :disabled="currentPage === 1">上一页</button>
       <button
+        id="page-btn"
         v-for="page in visiblePagesIndex"
         :key="page"
         @click="goToPage(page)"
@@ -25,7 +26,7 @@
       >
         {{ page }}
       </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+      <button id="page-btn" @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
     </div>
   </div>
 </template>
@@ -131,6 +132,14 @@ export default {
 </script>
 
 <style scoped>
+#page-btn {
+  border-radius: 10px;
+}
+
+hr {
+  border: none;
+}
+
 .pagination {
   display: flex;
   justify-content: center;

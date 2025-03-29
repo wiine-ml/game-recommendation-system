@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, send_file
 from ..models import Game, Interaction
+import random
 import os
 import zipfile
 from io import BytesIO
@@ -9,7 +10,8 @@ from ..utils import (
     construct_preview_path,
     check_image_exists,
     generate_preview_image,
-    get_default_image_path
+    get_default_image_path,
+    get_image_path,
 )
 
 AdminSetting = None
@@ -25,11 +27,24 @@ def read_game_image(game_id):
         if not game:
             return jsonify({"error": "游戏不存在"}), 404
         
+        """获取默认图片路径"""
+        base_folder='images/original_img'
+        default_image_folder = os.path.join(base_folder, 'default_image')
+        default_image_files = [
+            'default_game_cover_1.jpg',
+            'default_game_cover_2.jpg',
+            'default_game_cover_3.jpg',
+            'default_game_cover_4.jpg',
+            'default_game_cover_5.jpg'
+        ]
+    
+        # 随机选择一张默认图片
+        selected_image = random.choice(default_image_files)
         # 如果游戏没有设置图片，则使用默认图片
-        image_filename = game.gameImage if game.gameImage else "defaultGameImage.jpg"
+        image_filename = game.gameImage if game.gameImage else selected_image
         
         # 构造图片路径
-        image_path = construct_image_path(image_filename)
+        image_path = get_image_path(image_filename)
         
         # 检查图片文件是否存在
         if not check_image_exists(image_path):
@@ -55,24 +70,37 @@ def read_game_preview_image(game_id):
         if not game:
             return jsonify({"error": "游戏不存在"}), 404
         
+        """获取默认图片路径"""
+        base_folder='images/original_img'
+        default_image_folder = os.path.join(base_folder, 'default_image')
+        default_image_files = [
+            'default_game_cover_1.jpg',
+            'default_game_cover_2.jpg',
+            'default_game_cover_3.jpg',
+            'default_game_cover_4.jpg',
+            'default_game_cover_5.jpg'
+        ]
+    
+        # 随机选择一张默认图片
+        selected_image = random.choice(default_image_files)
         # 如果游戏没有设置图片，则使用默认图片
-        image_filename = game.gameImage if game.gameImage else "defaultGameImage.jpg"
+        image_filename = game.gameImage if game.gameImage else selected_image
         
         # 构造原图路径和预览图路径
-        image_path = construct_image_path(image_filename)
+        image_path = get_image_path(image_filename)
         preview_image_path = construct_preview_path(image_filename)
         
-        # 检查预览图是否存在
+  # 检查预览图是否存在
         if not check_image_exists(preview_image_path):
             # 如果预览图不存在，检查原图是否存在
             if not check_image_exists(image_path):
-                # 如果原图也不存在，返回默认图片
-                default_image_path = get_default_image_path()
+                # 如果原图也不存在，返回随机默认图片
+                default_image_path = get_image_path("defaultGameImage.jpg")
                 return send_file(default_image_path, mimetype='image/jpeg')
             
             # 如果原图存在但预览图不存在，生成预览图
             if not generate_preview_image(image_path, preview_image_path, Preview_size_x, Preview_size_y):
-                default_image_path = get_default_image_path()
+                default_image_path = get_image_path("defaultGameImage.jpg")
                 return send_file(default_image_path, mimetype='image/jpeg')
         
         # 返回预览图

@@ -1,5 +1,6 @@
 <template>
   <h1>热门游戏</h1>
+  <hr />
   <div class="carousel-container">
     <div class="carousel">
       <button class="carousel-button prev" @click="prevImage">&lt;</button>
@@ -9,15 +10,23 @@
       <button class="carousel-button next" @click="nextImage">&gt;</button>
     </div>
   </div>
+  <hr />
+  <ContentRecommendation :recommendationType="recommendationType" />
 </template>
 
 <script>
 import axios from 'axios'
 import JSZip from 'jszip'
+import { defineAsyncComponent } from 'vue'
 
 export default {
+  components: {
+    // 正确注册异步组件
+    ContentRecommendation: defineAsyncComponent(() => import('./ContentRecommendation.vue')),
+  },
   data() {
     return {
+      recommendationType: 'user_based_CF',
       images: [], // 存储解压后的图片数据
       currentImageIndex: 0, // 当前显示的图片索引
       carouselInterval: null, // 轮播定时器
@@ -115,6 +124,20 @@ export default {
 </script>
 
 <style>
+hr {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border: 0;
+  height: 1px;
+  background: #333;
+  background-image: linear-gradient(
+    to right,
+    var(--secondary-color),
+    var(--main-color),
+    var(--secondary-color)
+  );
+}
+
 .carousel-container {
   width: 100%;
   max-width: 800px;

@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-image">
-      <img :src="image" alt="图片" />
+      <img id="news-image" :src="this.newsImage" alt="图片" />
     </div>
     <div class="card-content">
       <h3 class="card-title">{{ title }}</h3>
@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import DataService from '@/services/DataService'
 export default {
   name: 'CardComponent',
   props: {
@@ -31,11 +32,55 @@ export default {
       type: String,
       required: true,
     },
+    id: {
+      type: Number,
+      required: true,
+    },
+  },
+  methods: {
+    async fetchNewsImage(newsId) {
+      try {
+        // 调用接口获取新闻图片
+        const imageResponse = await DataService.get(`/news/img/read/${newsId}`, {
+          responseType: 'blob', // 指定响应类型为 blob
+        })
+
+        // 创建图片的 URL
+        this.newsImage = URL.createObjectURL(imageResponse.data)
+        console.log(`获取新闻 ${newsId} 的图片成功:`, this.newsImage)
+      } catch (error) {
+        console.error(`获取新闻 ${newsId} 的图片失败:`, error)
+        // 如果获取图片失败，使用默认图片
+        this.newsImage = 'defaultNewsImage.jpg'
+      }
+    },
+  },
+  created() {
+    this.fetchNewsImage(this.id)
+  },
+  mounted() {
+    this.fetchNewsImage(this.id)
+  },
+  watch: {
+    id: function (newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.fetchNewsImage(newVal)
+      }
+    },
   },
 }
 </script>
 
 <style scoped>
+#news-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9; /* 设置宽高比为 16:9 */
+  object-fit: cover; /* 保持图片比例并裁剪 */
+  max-width: 100%;
+  max-height: 200px; /* 设置最大高度 */
+}
+
 .card {
   border: 1px solid var(--primary-color);
   border-radius: 8px;
@@ -64,7 +109,7 @@ export default {
 
 .card-description {
   font-size: 14px;
-  color: #555;
+  color: var(--contrast-color);
   margin: 8px 0;
 }
 

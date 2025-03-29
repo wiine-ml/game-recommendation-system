@@ -3,7 +3,8 @@
     <Card
       v-for="(item, index) in filteredCards"
       :key="index"
-      :image="item.image"
+      :id="item.id"
+      :image="newsImage"
       :title="item.title"
       :description="item.description"
       :date="item.date"
@@ -29,6 +30,7 @@ export default {
   data() {
     return {
       cards: [],
+      newsImage: '',
     }
   },
   methods: {

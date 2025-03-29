@@ -128,8 +128,8 @@ def search_review():
     }), 200
 
 
-@review_bp.route('/api/reviews/update/<int:interaction_id>', methods=['PUT'])
-def update_review(interaction_id):
+@review_bp.route('/api/reviews/update', methods=['PUT'])
+def update_review():
     """更新评论"""
     data = request.get_json()
     if not data:

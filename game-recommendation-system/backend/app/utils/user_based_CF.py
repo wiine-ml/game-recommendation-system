@@ -166,7 +166,8 @@ def generate_game_recommendations(user_interaction_matrix, target_user_id, simil
             # 如果目标用户已经评分过该游戏，则跳过
             if game_id in target_user_interactions:
                 if target_user_interactions[game_id] != 0.0:
-                    continue
+                    if target_user_interactions[game_id] != 1.0:
+                        continue
             
             # 计算预测评分
             similarity = dict(similar_users)[user_id]
@@ -190,3 +191,4 @@ def generate_game_recommendations(user_interaction_matrix, target_user_id, simil
 
     
     return sorted_recommendations
+

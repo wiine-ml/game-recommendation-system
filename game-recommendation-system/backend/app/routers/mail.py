@@ -3,10 +3,10 @@ from ..models import Mail, User, Developer, Publisher, Administrator
 from database import db
 
 str_model_map = {
-    'User': User,
-    'Developer': Developer,
-    'Publisher': Publisher,
-    'Administrator': Administrator,
+    'user': User,
+    'developer': Developer,
+    'publisher': Publisher,
+    'administrator': Administrator,
 }
 
 mail_bp = Blueprint('mail_api', __name__)
@@ -67,11 +67,10 @@ def send_mail():
 @mail_bp.route('/api/mail/read/page/<int:page>', methods=['GET'])
 def get_mail_paginated(page):
     '''获取邮件分页列表'''
-    data = request.get_json()
-    print('111')
-    print(data)
-    receiver_type = data['receiver_type']
-    receiver_id = data['receiver_id']
+    receiver_type = request.args.get('receiver_type')
+    receiver_id = request.args.get('receiver_id')
+
+    print(receiver_type, receiver_id)
 
     # 检查receiver_type是否在str_model_map中
     if receiver_type not in str_model_map:
@@ -95,7 +94,7 @@ def get_mail_paginated(page):
 
     # 分页查询邮件
     per_page = 10  # 每页显示的邮件数量
-    mails = Mail.query.filter_by(receiverType=receiver_type, receiverID=receiver_id).paginate(page, per_page, error_out=False)
+    mails = Mail.query.filter_by(receiverType=receiver_type, receiverID=receiver_id).paginate(page=page, per_page=per_page, error_out=False)
 
     # 构造返回数据
     mail_list = []

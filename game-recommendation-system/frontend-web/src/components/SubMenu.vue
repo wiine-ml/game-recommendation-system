@@ -38,7 +38,7 @@ export default {
           { text: '最受欢迎', link: '#' },
         ],
         类别: [
-          { text: '全部', link: '#', translation: '' },
+          { text: '全部', link: '#全部', translation: '' },
           { text: 'Action', link: '#', translation: '动作' },
           { text: 'Adventure', link: '#', translation: '冒险' },
           { text: 'Compilation', link: '#', translation: '合集' },
@@ -132,6 +132,13 @@ export default {
 </script>
 
 <style scoped>
+ul {
+  border-radius: 10px;
+  border: 5px solid var(--primary-color-alpha2);
+  border-top: 0px;
+  border-bottom: 0px;
+}
+
 h3 {
   background-color: var(--primary-color);
   padding: 5px;
