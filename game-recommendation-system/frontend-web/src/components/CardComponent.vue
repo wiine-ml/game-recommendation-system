@@ -13,6 +13,7 @@
 
 <script>
 import DataService from '@/services/DataService'
+
 export default {
   name: 'CardComponent',
   props: {
@@ -36,6 +37,12 @@ export default {
       type: Number,
       required: true,
     },
+  },
+  data() {
+    return {
+      newsImage: '',
+      isImageLoading: true, // 跟踪图片加载状态
+    }
   },
   methods: {
     async fetchNewsImage(newsId) {
@@ -75,10 +82,10 @@ export default {
 #news-image {
   width: 100%;
   height: auto;
-  aspect-ratio: 16/9; /* 设置宽高比为 16:9 */
-  object-fit: cover; /* 保持图片比例并裁剪 */
+  aspect-ratio: 16/9;
+  object-fit: cover;
   max-width: 100%;
-  max-height: 200px; /* 设置最大高度 */
+  max-height: 200px;
 }
 
 .card {

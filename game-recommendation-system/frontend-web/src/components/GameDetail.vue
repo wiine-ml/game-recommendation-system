@@ -176,7 +176,7 @@ export default {
   width: 80%;
   height: fit-content;
   max-width: 800px;
-  border-radius: 5px;
+  border-radius: 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   padding: 20px;
   position: relative;

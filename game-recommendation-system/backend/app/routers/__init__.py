@@ -14,9 +14,6 @@ from .recommendation import recommendation_bp
 from .user import user_bp
 from .administrator import administrator_bp
 from .autocomplete_search import autocomplete_bp
-
 from .vendor_img import vendor_home_page_bp
-
 from .game_vendor import game_vendor_bp
-
 from .mail import mail_bp

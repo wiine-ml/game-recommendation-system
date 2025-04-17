@@ -170,7 +170,6 @@ h3 {
 }
 
 .sidebar li {
-  border-radius: 10px;
   margin: 10px;
 }
 
@@ -181,16 +180,14 @@ h3 {
   color: var(--contrast-color);
   display: block;
   padding: 10px;
+  transition-property: color, background-color;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.5s;
 }
 
-.sidebar a:hover {
-  background-color: var(--main-color);
-  box-shadow: 0 0 5px var(--main-color);
-}
-
+.sidebar a:hover,
 .sidebar a.active {
   background-color: var(--main-color);
-  color: #fff;
   box-shadow: 0 0 5px var(--main-color);
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <div class="navbar-state">
-      <img src="/favicon.ico" alt="Logo" />
+      <img id="logo-icon" src="/favicon.ico" alt="Logo" />
     </div>
 
     <div class="navbar-avatar">
@@ -211,32 +211,35 @@ export default {
 </script>
 
 <style scoped>
+@keyframes ImgRotate {
+  80% {
+    transform: rotate(0turn);
+  }
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+#logo-icon {
+  animation: ImgRotate 30s infinite linear;
+}
+
 #mail-btn {
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  background-color: var(--background-color);
+  background-color: var(--secondary-color-alpha2);
   border-radius: 10px;
-  font-size: 30px;
-  width: 60px;
-  height: 35px;
-  margin-right: 15px;
-  margin-left: 15px;
-  border: 0px;
+  font-size: 25px;
+  margin: 0px 15px;
+  border: solid 3px var(--secondary-color);
   cursor: pointer;
 }
 
-/* 添加搜索提示的样式 */
 .search-suggestions {
   position: absolute;
   top: 100%;
-  background-color: var(--primary-color);
-  border: 1px solid var(--secondary-color);
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  width: 100%;
+  background-color: var(--primary-color-alpha1);
+  border: 3px solid var(--secondary-color-alpha2);
+  box-shadow: 10px 2px 4px rgba(0, 0, 0, 0.1);
+  width: 85%;
   max-height: 200px;
   overflow-y: auto;
 }
@@ -245,12 +248,10 @@ export default {
   display: flex;
   flex-direction: column;
   list-style: none;
-  padding: 0;
-  margin: 0;
 }
 
 .search-suggestions li {
-  padding: 8px 12px;
+  padding: 5px;
   cursor: pointer;
 }
 
@@ -261,13 +262,7 @@ export default {
 .search-container {
   position: relative;
 }
-/*其他 */
-body {
-  margin: 0;
-  padding: 0;
-  color: var(--main-color);
-  font-family: Arial, sans-serif;
-}
+
 .navbar {
   background-color: var(--primary-color);
   color: var(--contrast-color);
@@ -281,24 +276,29 @@ body {
 .navbar-state {
   color: var(--main-color);
 }
+
 .navbar-logo {
   display: flex;
   align-items: center;
 }
+
 .navbar-logo a {
   color: var(--main-color);
   text-decoration: none;
   font-weight: bold;
   font-size: 1.5rem;
 }
+
 li {
   list-style: none;
   float: left;
 }
+
 .navbar-avatar {
   display: flex;
   align-items: flex-end;
 }
+
 .navbar-avatar img {
   border-radius: 50%;
   width: 40px;
@@ -306,22 +306,21 @@ li {
   cursor: pointer;
   box-shadow: 0 0 30px var(--secondary-color);
 }
+
 .navbar-navigations {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: var(--secondary-color);
   color: var(--contrast-color);
   padding: 0.5rem 2rem;
   margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+
   width: 90% auto;
   border-radius: 5px;
   box-shadow: 0 0 5px var(--secondary-color);
 }
-.navbar-bottom-left {
-  display: flex;
-  align-items: center;
-}
+
 .navbar-bottom-left a {
   color: var(--main-color);
   text-decoration: none;
@@ -329,7 +328,12 @@ li {
   padding: 0.5rem;
   margin-left: 1rem;
   cursor: pointer;
+
+  transition-property: color, background-color;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.5s;
 }
+
 .navbar-bottom-left a:hover {
   background-color: var(--main-color);
   color: var(--contrast-color);
@@ -338,8 +342,7 @@ li {
 }
 
 #searchBtn {
-  padding: 0.5rem;
-  width: 80px;
+  width: 60px;
   height: 30px;
   background: var(--main-color-alpha1);
   color: var(--contrast-color);
@@ -351,26 +354,22 @@ li {
 
 #cleanBtn {
   padding: 0.5rem;
-  width: 50px;
+  width: 30px;
   height: 30px;
-  background: linear-gradient(to right, var(--primary-color-alpha2) 1%, var(--main-color) 99%);
-  color: #000;
+  background: var(--primary-color);
+  color: #aaa;
   border: none;
   cursor: pointer;
-  box-shadow: 0 0 10px var(--primary-color);
 }
 
 .search-container {
   display: flex;
+  justify-content: center;
   align-items: center;
 }
-.navbar-search {
-  margin-left: 50px;
-  display: flex;
-  align-items: center;
-}
+
 .navbar-search input[type='text'] {
-  padding: 0.5rem;
+  padding: 0.46rem;
   border: none;
   border-radius: 5px 0 0 5px;
 }

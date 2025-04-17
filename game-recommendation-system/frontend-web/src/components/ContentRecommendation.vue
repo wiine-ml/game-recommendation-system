@@ -218,21 +218,12 @@ export default {
   cursor: not-allowed;
 }
 
-.content-matrix {
-  background-color: var(--background-color);
-  color: var(--contrast-color);
-  padding: 20px;
-  border-radius: 5px;
-}
-
 table {
   width: 100%;
   text-align: center;
   border-collapse: separate;
   border-spacing: 0;
   border-radius: 10px;
-  border: solid 2px var(--contrasr-color);
-  margin: 0 auto;
 }
 
 tbody {
@@ -255,6 +246,8 @@ tr {
   background-color: var(--secondary-color);
   box-shadow: 0 0 5px var(--primary-color);
   margin: 10px 0;
+  transition-property: color, background-color;
+  transition-duration: 0.5s;
 }
 
 tr:hover {

@@ -3,7 +3,7 @@ from ..models import Game
 
 autocomplete_bp = Blueprint('autocomplete_api', __name__)
 
-@autocomplete_bp.route('/api/autocomplete/<string:query>', methods=['GET', 'POST'])
+@autocomplete_bp.route('/api/autocomplete/<string:query>', methods=['POST'])
 def autocomplete_search(query: str):
     print(query)
     try:

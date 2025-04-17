@@ -3,16 +3,20 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import axios from './services/DataService.js'
 import store from './services/Store.js'
-// 引入 ECharts 核心模块
+// 引入ECharts核心模块
 import * as echarts from 'echarts/core'
 
-// 引入 Canvas 渲染器
+// 引入Canvas渲染器
 import { CanvasRenderer } from 'echarts/renderers'
 echarts.use([CanvasRenderer])
 
-// 引入需要的图表类型和组件
+// 引入图表组件
 import { BarChart } from 'echarts/charts'
 import { TitleComponent, TooltipComponent, GridComponent } from 'echarts/components'
+
+//引入element-plus
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 
 //路由跳转
 
@@ -26,4 +30,6 @@ app.config.devtools = false
 app.config.productionTip = false
 
 app.use(store)
+app.use(ElementPlus)
+
 app.mount('#app')

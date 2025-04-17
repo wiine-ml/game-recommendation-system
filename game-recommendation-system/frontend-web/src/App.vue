@@ -1,25 +1,27 @@
 <template>
-  <!-- 顶部菜单栏 -->
-  <div class="top-menu-container">
-    <TopMenu @updataSubMenu="UpdateSubMenu" />
-  </div>
-  <!-- 中间内容区 -->
-  <div class="middle-container">
-    <!-- 左侧子菜单栏 -->
-    <div class="sub-menu-container">
-      <SubMenu
-        :activeSubMenu="activeSubMenu"
-        :activeMainContent="activeMainContent"
-        @UpdateMainContent="UpdateMainContent"
-      />
+  <div class="body-container">
+    <!-- 顶部菜单栏 -->
+    <div class="top-menu-container">
+      <TopMenu @updataSubMenu="UpdateSubMenu" />
     </div>
-    <!-- 右侧主要内容区 -->
-    <div class="main-content-container">
-      <!-- 若未登陆: 显示登录注册框 -->
-      <Component v-if="!isLogin" :is="curLoginView" @UpdateLoginView="UpdateLoginView" />
+    <!-- 中间内容区 -->
+    <div class="middle-container">
+      <!-- 左侧子菜单栏 -->
+      <div class="sub-menu-container">
+        <SubMenu
+          :activeSubMenu="activeSubMenu"
+          :activeMainContent="activeMainContent"
+          @UpdateMainContent="UpdateMainContent"
+        />
+      </div>
+      <!-- 右侧主要内容区 -->
+      <div class="main-content-container">
+        <!-- 若未登陆: 显示登录注册框 -->
+        <Component v-if="!isLogin" :is="curLoginView" @UpdateLoginView="UpdateLoginView" />
 
-      <!-- 若已登陆: 显示主要内容区 -->
-      <MainContentBox v-else :activeMainContent="activeMainContent" />
+        <!-- 若已登陆: 显示主要内容区 -->
+        <MainContentBox v-else :activeMainContent="activeMainContent" />
+      </div>
     </div>
   </div>
 </template>
@@ -96,6 +98,11 @@ export default {
 </script>
 
 <style scoped>
+.body-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .top-menu-container {
   justify-content: space-around;
 }
