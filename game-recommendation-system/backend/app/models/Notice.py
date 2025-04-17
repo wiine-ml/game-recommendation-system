@@ -87,5 +87,5 @@ class Notice(db.Model):
             'title': self.title,
             'content': self.content,
             'username': self.username,
-            # 添加其他需要的字段
+            'date': self.date.strftime('%Y-%m-%d')
         }

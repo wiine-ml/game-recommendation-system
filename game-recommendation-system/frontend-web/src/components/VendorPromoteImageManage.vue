@@ -38,7 +38,7 @@
   </div>
 
   <!-- 厂商游戏列表 -->
-  <ContentMatrix :activeMainContent="activeContent" class="vendor-games" />
+  <ContentMatrix :activeMainContent="activeContent" :interactable="false" class="vendor-games" />
 </template>
 
 <script>

@@ -123,7 +123,11 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+img {
+  border-radius: 15px;
+}
+
 hr {
   margin-top: 5px;
   margin-bottom: 5px;

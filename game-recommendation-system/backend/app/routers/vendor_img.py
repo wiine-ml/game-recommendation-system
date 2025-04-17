@@ -1,6 +1,7 @@
 from io import BytesIO
 from flask import Blueprint, request, jsonify, send_file
 import os
+import random
 from ..models import User, Interaction, Developer, Publisher, Game, game_developers, game_publishers
 from database import db
 import zipfile
@@ -404,30 +405,52 @@ def read_vendor_promoted_image():
         vendor_id = request.args.get('vendor_id')
         vendor_type = request.args.get('vendor_type')
 
+        print('vendor_id:' + vendor_id)
+        print('vendor_type:' + vendor_type)
+
         promoted_game_ids = set()
 
+     
         if vendor_type == 'developer':
-            promoted_developer_games = db.session.query(game_developers).filter_by(is_promoted=True).all()
+            # 查询开发商对应的推广游戏
+            promoted_developer_games = db.session.query(game_developers).filter_by(
+                DeveloperID=vendor_id, is_promoted=1
+            ).all()
+            print(f"查询到的推广游戏记录: {promoted_developer_games}")
             for record in promoted_developer_games:
                 promoted_game_ids.add(record.GameID)
 
         elif vendor_type == 'publisher':
-            promoted_publisher_games = db.session.query(game_publishers).filter_by(is_promoted=True).all()
+            # 查询发行商对应的推广游戏
+            promoted_publisher_games = db.session.query(game_publishers).filter_by(
+                PublisherID=vendor_id, is_promoted=1
+            ).all()
+            print(f"查询到的推广游戏记录: {promoted_publisher_games}")
             for record in promoted_publisher_games:
                 promoted_game_ids.add(record.GameID)
 
         # 根据 GameID 查询游戏对象
         promoted_games = Game.query.filter(Game.id.in_(promoted_game_ids)).all()
 
-        if not promoted_games:
-            return jsonify({"message": "没有推广游戏数据"}), 200
+        # 获取默认图片路径
+        base_folder = 'images/original_img'
+        default_image_files = [
+            'default_game_cover_1.jpg',
+            'default_game_cover_2.jpg',
+            'default_game_cover_3.jpg',
+            'default_game_cover_4.jpg',
+            'default_game_cover_5.jpg'
+        ]
+
+        # 随机选择一张默认图片
+        selected_image = random.choice(default_image_files)
 
         # 创建一个内存中的 ZIP 文件
         zip_buffer = BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for game in promoted_games:
                 # 构造图片路径
-                image_filename = game.gameImage if game.gameImage else "defaultGameImage.jpg"
+                image_filename = game.gameImage if game.gameImage else selected_image
                 image_path = construct_image_path(image_filename)
                 print(f"图片路径: {image_path}")  # 打印图片路径，检查是否正确
 
@@ -445,6 +468,7 @@ def read_vendor_promoted_image():
 
         # 准备返回 ZIP 文件
         zip_buffer.seek(0)
+        print("返回ZIP文件")  # 打印返回ZIP文件的信息
         return send_file(
             zip_buffer,
             mimetype='application/zip',
@@ -453,5 +477,5 @@ def read_vendor_promoted_image():
         )
 
     except Exception as e:
-        print(str(e))
+        print(f"错误: {str(e)}")
         return jsonify({"error": str(e)}), 500

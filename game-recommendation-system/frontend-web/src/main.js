@@ -13,6 +13,9 @@ echarts.use([CanvasRenderer])
 // 引入需要的图表类型和组件
 import { BarChart } from 'echarts/charts'
 import { TitleComponent, TooltipComponent, GridComponent } from 'echarts/components'
+
+//路由跳转
+
 echarts.use([BarChart, TitleComponent, TooltipComponent, GridComponent])
 
 const app = createApp(App)

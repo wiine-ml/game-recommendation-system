@@ -40,12 +40,22 @@
           <td>{{ game.gameGenre || '暂无' }}</td>
           <td>{{ game.gamePlatform || '暂无' }}</td>
           <td>
-            <a href="#" @click.prevent="showVendorHomePage(game.gameDeveloperId)">
+            <a
+              href="#"
+              @click.prevent="
+                handleVendorLinkClick('developer', game.gameDeveloperID, game.gameDeveloper)
+              "
+            >
               {{ game.gameDeveloper || '暂无' }}
             </a>
           </td>
           <td>
-            <a href="#" @click.prevent="showVendorHomePage(game.gamePublisherId)">
+            <a
+              href="#"
+              @click.prevent="
+                handleVendorLinkClick('publisher', game.gamePublisherID, game.gamePublisher)
+              "
+            >
               {{ game.gamePublisher || '暂无' }}
             </a>
           </td>
@@ -88,12 +98,23 @@
 
   <!-- 游戏详情弹出层 -->
   <GameDetail :showDetail="showDetail" :gameDetail="selectedGame" @close-detail="closeDetail" />
+
+  <!-- 厂商信息弹出层 -->
+  <VendorHomePage
+    v-if="showVendorPage"
+    :vendor_id_prop="selectedVendorId"
+    :vendor_name_prop="selectedVendorName"
+    :vendor_type_prop="selectedVendroType"
+    :onPriview="true"
+    @close-vendor-page="closeVendorPage"
+  />
 </template>
 
 <script>
 import DataService from '../services/DataService.js'
 import store from '@/services/Store.js'
 import GameDetail from './GameDetail.vue'
+import VendorHomePage from './VendorHomePage.vue'
 
 export default {
   props: {
@@ -106,9 +127,14 @@ export default {
       required: false,
       default: true,
     },
+    vendorID: {
+      required: false,
+      default: null,
+    },
   },
   components: {
     GameDetail,
+    VendorHomePage,
   },
   data() {
     return {
@@ -118,7 +144,13 @@ export default {
       totalPages: 1,
       maxPaginationIndex: 5,
       showDetail: false,
+      showVendorPage: false,
+      //showgameprops
       selectedGame: null,
+      //showvendorprops
+      selectedVendorId: undefined,
+      selectedVendorName: undefined,
+      selectedVendroType: undefined,
     }
   },
   created() {
@@ -136,6 +168,24 @@ export default {
     },
   },
   methods: {
+    handleVendorLinkClick(type, id, name) {
+      console.log('点击厂商:' + type + ' 名称:' + name + ' id:' + id)
+      if (type === undefined || name === undefined) return
+
+      this.selectedVendorId = id
+      this.selectedVendorName = name
+      this.selectedVendroType = type
+
+      this.showVendorPage = true
+    },
+    closeVendorPage() {
+      console.log('关闭厂商窗口')
+      this.selectedVendorId = undefined
+      this.selectedVendorName = undefined
+      this.selectedVendroType = undefined
+
+      this.showVendorPage = false
+    },
     async handleGameTitleClick(game) {
       await this.updateInteraction(game, game.isSubscribed, game.isDisliked, true)
       this.showGameDetail(game)
@@ -187,9 +237,10 @@ export default {
           page_id: this.currentPage,
           itemPerpage: store.state.preference.itemPerpage,
           user_id: store.state.user.userID,
-
-          developer_id: this.$store.getters['vendor/vendorID'],
+          developer_id: this.vendorID,
         }
+
+        console.log('参数params' + params.developer_id)
 
         switch (this.activeMainContent) {
           case '关注':

@@ -3,7 +3,6 @@ import math
 from database import db
 from ..models import Interaction
 
-print
 
 def review_score_normalization(x):
     '评论分数归一化'

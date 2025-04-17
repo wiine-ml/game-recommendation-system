@@ -202,7 +202,7 @@ def delete_user():
     """删除用户"""
     pass
 
-@user_bp.route('/api/users/passwor/dupdate', methods=['POST'])
+@user_bp.route('/api/users/password/update', methods=['POST'])
 def update_user_password():
     """更新用户密码"""
     try:

@@ -1,7 +1,7 @@
 <template>
   <div class="user-avatar-container" @mouseenter="showInfo" @mouseleave="hideInfo">
     <!-- 动态绑定头像图片的 src 属性 -->
-    <img :src="userAvatar" alt="Avatar" class="user-avatar" />
+    <img :src="userAvatar" alt="Avatar" class="user-avatar" v-if="showAvatar" />
     <div class="user-info-panel" v-if="showInfoPanel">
       <div class="user-info-content">
         <div class="info-row" v-if="this.$store.getters.currentLoginType === 'user'">
@@ -37,6 +37,9 @@ export default {
   },
   computed: {
     ...mapGetters('user', ['avatarUrl']),
+    showAvatar() {
+      return true
+    },
     userAvatar() {
       // 如果用户已登录且有头像 URL，则返回头像 URL
       if (store.getters.currentLoginType === 'user' && store.getters.isLogin && this.avatarUrl) {
@@ -48,7 +51,7 @@ export default {
         return this.$store.getters['vendor/avatarUrl']
       }
       // 如果用户未登录或没有头像 URL，返回默认头像
-      return '/default-avatar.png'
+      return '/defaultUserImg.jpg'
     },
   },
   methods: {

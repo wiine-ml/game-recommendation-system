@@ -23,7 +23,9 @@ def construct_game_response(games, user_id=None, include_interaction=True):
             "gameGenre": game.gameGenre,
             "gamePlatform": game.gamePlatform,
             "gameDeveloper": game.developers[0].DeveloperName if game.developers else None,
+            "gameDeveloperID": game.developers[0].DeveloperID if game.developers else None,
             "gamePublisher": game.publishers.PublisherName if game.publishers else None,  # 获取发行商名称
+            "gamePublisherID": game.publishers.PublisherID if game.publishers else None,  # 获取发行商名称
             "followers": subscribed_count if subscribed_count else 0,
             "rating": round(rating_avg, 2) if rating_avg else 0,
             "ratingPhrase": game.ratingPhrase,
@@ -480,6 +482,7 @@ def read_games_by_publisher_paginated(page_id):
 def read_games_by_developer_paginated(page_id):
     """根据游戏开发商查找游戏，并支持分页"""
     developer_id = request.args.get('developer_id')
+    print(request.args)
     items_per_page = int(request.args.get('itemPerpage', 10))  # 每页显示的条数，默认为10
     user_id = request.args.get('user_id')  # 可选用户ID，用于获取用户交互状态
 

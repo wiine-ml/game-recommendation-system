@@ -76,12 +76,6 @@ export default {
         查询公告: {
           columns: [
             { field: 'id', label: '公告编号', type: 'text' },
-            {
-              field: 'avatar',
-              label: '头像',
-              type: 'image',
-              style: 'width: 40px; height: 40px; border-radius: 50%',
-            },
             { field: 'username', label: '发布者', type: 'text' },
             { field: 'title', label: '标题', type: 'text' },
             { field: 'content', label: '内容', type: 'text' },
@@ -187,6 +181,10 @@ export default {
           })
         } else if (this.activeMainContent === '查询新闻') {
           this.currentData = response.data.data.map((item) => {
+            return this.formatData(item)
+          })
+        } else if (this.activeMainContent === '查询公告') {
+          this.currentData = response.data.data.notices.map((item) => {
             return this.formatData(item)
           })
         }
