@@ -153,17 +153,13 @@ export default {
   height: 200px;
 }
 
-.img {
-  float: left;
-}
-
 .game-detail-overlay {
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: #00000000;
+  background-color: #00000055;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -176,7 +172,7 @@ export default {
   width: 80%;
   height: fit-content;
   max-width: 800px;
-  border-radius: 15px;
+  border-radius: 15px 0 0 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   padding: 20px;
   position: relative;

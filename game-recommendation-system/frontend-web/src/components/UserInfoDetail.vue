@@ -11,7 +11,7 @@
           <span class="info-value">{{ userInfo.review_count || -1 }}</span>
         </div>
         <div class="info-row">
-          <button class="exit-button" @click="logout">退出登陆</button>
+          <el-button type="danger" plain class="exit-button" @click="logout">退出登陆</el-button>
         </div>
       </div>
     </div>
@@ -102,25 +102,13 @@ export default {
 
 <style scoped>
 .exit-button {
-  border-radius: 13px;
   width: 100%;
   height: 40px;
+  border-radius: 15px;
   border: none;
   text-align: center;
-  text-decoration: none;
-  background-color: var(--main-color);
-  color: var(--contrast-color);
-  padding: 10px;
+  background-color: #333;
   display: inline-block;
-  box-shadow:
-    0 1px 3px 0 var(--main-color-alpha2),
-    0 1px 3px 0 var(--main-color-alpha2);
-}
-
-.exit-button:hover {
-  box-shadow:
-    0 3px 3px 1 var(--main-color-alpha2),
-    0 3px 3px 0 var(--main-color-alpha2);
 }
 
 .user-avatar-container {
@@ -161,11 +149,10 @@ export default {
 }
 
 .info-label {
-  font-weight: bold;
   color: var(--contrast-color);
 }
 
 .info-value {
-  color: var(--main-color);
+  color: var(--main-color-alpha2);
 }
 </style>

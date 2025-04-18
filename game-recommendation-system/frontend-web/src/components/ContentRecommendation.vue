@@ -187,10 +187,14 @@ export default {
 </script>
 
 <style scoped>
+img {
+  border-radius: 20%;
+}
+
 .subscribed-btn,
 .dislike-btn {
   width: 30px;
-  background-color: #00000000;
+  background-color: transparent;
   border-radius: 25%;
   border-style: dashed;
 }
@@ -227,10 +231,9 @@ table {
 }
 
 tbody {
-  border-top: 3px solid var(--secondary-color);
-  border-bottom: 3px solid var(--secondary-color);
-  margin: 10px 0;
+  border: 3px solid var(--secondary-color);
 }
+
 th,
 td {
   padding: 12px;
@@ -244,48 +247,37 @@ th {
 
 tr {
   background-color: var(--secondary-color);
-  box-shadow: 0 0 5px var(--primary-color);
-  margin: 10px 0;
+  box-shadow: 3px 3px 3px 3px var(--primary-color-alpha1);
   transition-property: color, background-color;
   transition-duration: 0.5s;
 }
 
-tr:hover {
+tr:hover,
+tr:nth-child(odd):hover {
   background-color: var(--primary-color);
 }
 
 tr:nth-child(odd) {
   background-color: var(--secondary-color-light);
-  color: var(--contrasr-color);
-}
-
-tr:nth-child(odd):hover {
-  background-color: var(--primary-color);
-  color: var(--contrasr-color);
 }
 
 a {
   color: var(--main-color);
 }
 
-table tr th:first-child,
-table tr td:first-child {
-  border-left: 2px solid var(--primary-color); /* 给table设置左边框 */
+table tr:first-child,
+th:first-child {
+  border-top-left-radius: 10px;
 }
-table tr th:last-child,
-table tr td:last-child {
-  border-right: 2px solid var(--primary-color); /* 给table设置右边框 */
+table tr:first-child,
+th:last-child {
+  border-top-right-radius: 10px;
 }
-table tr:first-child th:first-child {
-  border-top-left-radius: 10px; /* 设置table左上圆角 */
+
+tr:last-child > td:first-child {
+  border-bottom-left-radius: 10px;
 }
-table tr:first-child th:last-child {
-  border-top-right-radius: 10px; /* 设置table右上圆角 */
-}
-table tr:last-child td:first-child {
-  border-bottom-left-radius: 10px; /* 设置table左下圆角 */
-}
-table tr:last-child td:last-child {
-  border-bottom-right-radius: 10px; /* 设置table右下圆角 */
+tr:last-child > td:last-child {
+  border-bottom-right-radius: 10px;
 }
 </style>

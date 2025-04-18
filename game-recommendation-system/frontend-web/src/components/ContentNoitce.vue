@@ -132,18 +132,30 @@ export default {
 </script>
 
 <style scoped>
-#page-btn {
-  border-radius: 10px;
+@keyframes hrAnimator {
+  0% {
+    transform: translateX(-700px);
+  }
+  100% {
+    transform: translateX(700px);
+  }
 }
 
 hr {
-  border: none;
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--main-color-alpha2), transparent);
+  animation: hrAnimator 5s infinite linear;
+}
+
+#page-btn {
+  border-radius: 10px;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 .pagination button {
@@ -178,6 +190,7 @@ ul {
   padding: 1rem;
   position: relative;
   word-break: break-all;
+  overflow: hidden;
 }
 .header {
   display: flex;

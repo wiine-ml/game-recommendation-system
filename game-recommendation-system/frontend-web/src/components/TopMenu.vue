@@ -328,7 +328,6 @@ li {
   padding: 0.5rem;
   margin-left: 1rem;
   cursor: pointer;
-
   transition-property: color, background-color;
   transition-timing-function: ease-in-out;
   transition-duration: 0.5s;
@@ -370,7 +369,6 @@ li {
 
 .navbar-search input[type='text'] {
   padding: 0.46rem;
-  border: none;
   border-radius: 5px 0 0 5px;
 }
 </style>
