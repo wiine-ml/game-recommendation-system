@@ -199,13 +199,20 @@ export default {
       return ''
     },
     onSearchComplete() {
-      console.log('searchQuery:', this.searchQuery.length)
-      console.log('suggestions:', this.searchSuggestions.length)
+      console.log(
+        '搜索框状态信息>>> ' +
+          '(搜索查询状态:' +
+          this.searchQuery.length +
+          ' | ' +
+          '搜索建议状态:' +
+          this.searchSuggestions.length +
+          ')',
+      )
       return this.searchSuggestions.length > 0 && this.searchQuery.length > 0
     },
   },
   mounted() {
-    console.log(store.getters.currentLoginType)
+    console.log('当前登陆类型>>> ', store.getters.currentLoginType)
   },
 }
 </script>

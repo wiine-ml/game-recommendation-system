@@ -29,8 +29,6 @@
         <span class="hint"> 数值过大会导致卡顿</span>
       </div>
     </div>
-
-    <hr />
   </div>
 </template>
 
@@ -98,20 +96,6 @@ export default {
 
 .hint {
   color: var(--contrast-color-alpha2);
-}
-
-hr {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border: 0;
-  height: 1px;
-  background: #333;
-  background-image: linear-gradient(
-    to right,
-    var(--secondary-color),
-    var(--main-color),
-    var(--secondary-color)
-  );
 }
 
 .content-setting {

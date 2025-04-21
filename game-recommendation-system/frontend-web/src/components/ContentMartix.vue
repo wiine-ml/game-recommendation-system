@@ -175,7 +175,6 @@ export default {
       this.selectedVendorId = id
       this.selectedVendorName = name
       this.selectedVendroType = type
-
       this.showVendorPage = true
     },
     closeVendorPage() {
@@ -240,8 +239,6 @@ export default {
           developer_id: this.vendorID,
         }
 
-        console.log('参数params' + params.developer_id)
-
         switch (this.activeMainContent) {
           case '关注':
             url = '/games/read/subscribed/page/' + this.currentPage
@@ -268,7 +265,7 @@ export default {
         const responseData = response.data
 
         // 获取每页的游戏数据
-        console.log('Response Data:', responseData)
+        console.log('获取分页游戏数据>>> ', responseData)
         const games = responseData.data.games.map((game) => ({
           ...game,
           isSubscribed: game.subscribed,

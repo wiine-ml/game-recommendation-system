@@ -77,9 +77,9 @@ export default {
         this.notices = response.data.data.notices
         this.totalPages = response.data.data.totalPages
         this.currentNotices = this.notices
-        console.log('获取公告数据成功:', response.data)
+        console.log('获取公告数据成功>>> ', response.data)
       } catch (error) {
-        console.error('获取公告数据失败:', error)
+        console.error('获取公告数据失败>>> ', error)
       } finally {
         this.isLoading = false
       }
@@ -132,20 +132,8 @@ export default {
 </script>
 
 <style scoped>
-@keyframes hrAnimator {
-  0% {
-    transform: translateX(-700px);
-  }
-  100% {
-    transform: translateX(700px);
-  }
-}
-
 hr {
-  border: 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--main-color-alpha2), transparent);
-  animation: hrAnimator 5s infinite linear;
+  margin: 0px 20px;
 }
 
 #page-btn {

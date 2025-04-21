@@ -62,7 +62,7 @@ export default {
       this.activeSubMenu = newSubMenu
     },
     UpdateMainContent(newMainContent) {
-      console.log(newMainContent)
+      console.log('当前页面>>> (' + newMainContent + ')')
       this.activeMainContent = newMainContent
     },
   },

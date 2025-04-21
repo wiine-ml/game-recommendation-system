@@ -20,6 +20,9 @@ import JSZip from 'jszip'
 import { defineAsyncComponent } from 'vue'
 
 export default {
+  props: {
+    activeMainContent: String,
+  },
   components: {
     // 正确注册异步组件
     ContentRecommendation: defineAsyncComponent(() => import('./ContentRecommendation.vue')),
@@ -70,13 +73,13 @@ export default {
           }
         }
 
-        // 按文件名排序（可选）
+        // 按文件名排序
         imageFiles.sort((a, b) => a.name.localeCompare(b.name))
 
         // 限制最多5张图片
         const maxImages = 5
         const selectedFiles = imageFiles.slice(0, maxImages)
-        console.log('selectedFiles:', selectedFiles)
+        console.log('接收文件>>> ', selectedFiles)
 
         // 将图片转换为Base64格式
         this.images = await Promise.all(
@@ -91,7 +94,7 @@ export default {
           console.error('没有找到图片文件')
         }
       } catch (error) {
-        console.error('获取或解压图片失败:', error)
+        console.error('获取或解压图片失败>>> ', error)
       }
     },
     startCarousel() {

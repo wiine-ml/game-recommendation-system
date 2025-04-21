@@ -30,14 +30,32 @@
             />
           </td>
           <td>
-            <a href="#" @click.prevent="handleGameTitleClick(game)">
+            <a :href="`/推荐/game/${game.id}`" @click.prevent="handleGameTitleClick(game)">
               {{ game.gameTitle || '暂无' }}
             </a>
           </td>
           <td>{{ game.gameGenre || '暂无' }}</td>
           <td>{{ game.gamePlatform || '暂无' }}</td>
-          <td>{{ game.gameDeveloper || '暂无' }}</td>
-          <td>{{ game.gamePublisher || '暂无' }}</td>
+          <td>
+            <a
+              href="#"
+              @click.prevent="
+                handleVendorLinkClick('developer', game.gameDeveloperID, game.gameDeveloper)
+              "
+            >
+              {{ game.gameDeveloper || '暂无' }}
+            </a>
+          </td>
+          <td>
+            <a
+              href="#"
+              @click.prevent="
+                handleVendorLinkClick('publisher', game.gamePublisherID, game.gamePublisher)
+              "
+            >
+              {{ game.gamePublisher || '暂无' }}
+            </a>
+          </td>
           <td>{{ game.followers || 0 }}</td>
           <td>{{ game.rating || 0 }}</td>
           <td>{{ game.ratingPhrase || '暂无' }}</td>
@@ -69,6 +87,9 @@ import GameDetail from './GameDetail.vue'
 
 export default {
   props: {
+    activeMainContent: {
+      type: String,
+    },
     recommendationType: {
       type: String,
       required: false,
@@ -90,6 +111,10 @@ export default {
     this.fetchRecommendations()
   },
   methods: {
+    handleVendorLinkClick() {
+      console.log('开发商界面跳转>>> TODO')
+      return
+    },
     async handleGameTitleClick(game) {
       await this.updateInteraction(game, game.isSubscribed, game.isDisliked, true)
       this.showGameDetail(game)
@@ -132,7 +157,6 @@ export default {
     },
     async fetchRecommendations() {
       try {
-        console.log('获取推荐数据中...')
         const response = await DataService.get('/recommendations/read', {
           params: {
             user_id: store.state.user.userID,
@@ -154,7 +178,7 @@ export default {
           try {
             // 调用接口获取预览图片
             const imageResponse = await DataService.get(`/games/preview_image/read/${game.id}`, {
-              responseType: 'blob', // 指定响应类型为 blob
+              responseType: 'blob',
             })
 
             // 创建图片的 URL
@@ -166,11 +190,10 @@ export default {
           return game
         })
 
-        // 等待所有游戏的图片加载完成
         this.currentGames = await Promise.all(gamePromises)
-        console.log('获取推荐数据成功:', response.data)
+        console.log('获取推荐数据成功>>> ', response.data)
       } catch (error) {
-        console.error('获取推荐数据失败:', error)
+        console.error('获取推荐数据失败>>> ', error)
         alert('获取推荐数据失败')
       }
     },

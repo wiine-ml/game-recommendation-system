@@ -1,4 +1,8 @@
 <template>
+  <hr />
+  <h2 class="title" id="intro">欢迎使用 GRS 游戏推荐系统</h2>
+  <hr />
+
   <div class="content-flat">
     <div class="content-item" v-for="(item, index) in contents" :key="index">
       <h2 class="title" v-if="item.mainTitle">{{ item.mainTitle }}</h2>
@@ -7,14 +11,14 @@
         <div v-if="item.para.content">
           <p class="para-content">{{ item.para.content }}</p>
         </div>
+
         <div v-else-if="item.para.multiLine && item.para.multiLine.length > 0">
           <p class="para-content" v-for="(line, lineIndex) in item.para.multiLine" :key="lineIndex">
             {{ line }}
           </p>
         </div>
-        <div v-else>
-          <hr />
-        </div>
+
+        <div v-else></div>
       </div>
     </div>
   </div>
@@ -22,11 +26,12 @@
 
 <script>
 export default {
+  props: ['activeMainContent'],
   data() {
     return {
       contents: [
         {
-          mainTitle: '欢迎使用 GRS 游戏推荐系统',
+          mainTitle: '',
           para: {
             subTitle: '团队及其使命介绍',
             content:
@@ -64,15 +69,30 @@ export default {
 </script>
 
 <style scoped>
+#intro {
+  display: flex;
+  margin: 0px 50px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  color: var(--contrast-color);
+  background-image: linear-gradient(
+    to right,
+    var(--secondary-color-alpha2) 5%,
+    var(--primary-color) 50%,
+    var(--secondary-color-alpha2) 95%
+  );
+}
+
 .content-flat {
-  width: 100%;
+  width: 80%;
   background-color: var(--secondary-color);
   padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  box-sizing: border-box;
   min-height: 100vh;
   margin: 0 auto;
 }
@@ -81,24 +101,30 @@ export default {
   background-color: var(--primary-color);
   padding: 1.5rem;
   border-radius: 20px;
-  width: 80%;
-  box-sizing: border-box;
+  width: 60%;
+}
+
+@media (max-width: 2000px) {
+  .content-item {
+    width: 100%;
+  }
 }
 
 .title {
-  color: var(--contrast-color);
+  color: var(--main-color-alpha1);
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
 .sub-title {
-  color: #d3d3d3;
-  font-size: 1.2rem;
+  color: var(--main-color-alpha1);
+  font-size: 1.3rem;
+  font-style: bold;
 }
 
 .para-content {
-  color: #d3d3d3;
+  color: var(--contrast-color);
   font-size: 1rem;
-  line-height: 1.8;
+  line-height: 1.5;
 }
 </style>

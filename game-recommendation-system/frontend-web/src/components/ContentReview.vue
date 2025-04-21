@@ -1,14 +1,17 @@
 <template>
   <div class="control-panel">
-    <button @click.prevent="fetchAllReviews">刷新</button>
-    <button @click.prevent="addReviewBtn">{{ addReviewText }}</button>
-    <button @click.prevent="deleteReviewBtn">{{ delReviewText }}</button>
-    <button @click.prevent="deleteConfirmBtn" v-if="isDeleting">删除</button>
+    <el-button type="info" @click.prevent="fetchAllReviews" round>刷新</el-button>
+    <el-button type="primary" @click.prevent="addReviewBtn" round>{{ addReviewText }}</el-button>
+    <el-button type="primary" @click.prevent="deleteReviewBtn" round>{{ delReviewText }}</el-button>
+    <el-button type="danger" @click.prevent="deleteConfirmBtn" v-if="isDeleting" round
+      >删除</el-button
+    >
   </div>
 
-  <div class="add-review-form" v-if="isAdding">
+  <div v-if="isAdding">
     <hr />
 
+    <label>游戏ID</label>
     <input
       v-model="newReview.game_id"
       type="number"
@@ -16,6 +19,7 @@
       @input="fetchGameInfo"
       @wheel="fetchGameInfo"
     />
+
     <input
       class="game-name-tip"
       type="text"
@@ -32,6 +36,8 @@
         }
       "
     />
+
+    <label>评分</label>
     <input
       v-model="newReview.rating"
       type="number"
@@ -41,8 +47,11 @@
       max="5"
       @wheel.prevent
     />
+
+    <label>评论内容</label>
     <input v-model="newReview.comment" type="text" placeholder="评论内容" style="width: 30%" />
-    <button class="confirm-btn" @click="submitReview">添加评论</button>
+
+    <el-button type="success" @click="submitReview" round>添加评论</el-button>
   </div>
 
   <hr />
@@ -51,7 +60,6 @@
     <table>
       <thead>
         <tr>
-          <!--<th>编号</th>-->
           <th>游戏id</th>
           <th>游戏名称</th>
           <th>评分</th>
@@ -116,7 +124,7 @@ export default {
       },
       isAdding: false,
       isDeleting: false,
-      selectedGameIds: [], // 用于存储选中的游戏ID
+      selectedGameIds: [],
     }
   },
   created() {
@@ -317,74 +325,19 @@ export default {
 
 <style scoped>
 input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
-
-h3 {
-  float: left;
-  margin-top: 10px;
-  margin-right: 10px;
-  font-style: bold;
-}
-
 input {
-  background-color: var(--primary-color);
   width: 120px;
-  height: 44px;
-  text-align: center;
-  border: 1px solid var(--secondary-color);
-  border-radius: 5px;
-  margin-right: 10px;
-}
-
-.input:focus {
-  color: rgb(0, 255, 255);
-  background-color: #212121;
-  outline-color: rgb(0, 255, 255);
-  box-shadow: -3px -3px 15px rgb(0, 255, 255);
-  transition: 0.1s;
-  transition-property: box-shadow;
-}
-
-button {
-  width: 88px;
-  height: 44px;
+  height: 40px;
+  margin: 5px 10px 5px 5px;
   border-radius: 10px;
+  background-color: var(--primary-color);
   text-align: center;
-  background-color: var(--secondary-color);
-  color: var(--contrast-color);
-  margin-bottom: 10px;
-  margin-right: 20px;
-  padding: 10px;
-}
-
-button:hover {
-  background-color: var(--main-color);
-  box-shadow: 0 0 5px var(--secondary-color);
-}
-
-button.active {
-  background-color: var(--main-color);
-  color: var(--main-color);
-}
-
-hr {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  border: 0;
-  height: 1px;
-  background: #333;
-  background-image: linear-gradient(
-    to right,
-    var(--secondary-color),
-    var(--main-color),
-    var(--secondary-color)
-  );
 }
 
 .content-list {
-  height: 100%;
   overflow: auto;
 }
 
@@ -392,15 +345,6 @@ ul {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-.content-item {
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  border-bottom: 1px solid #ccc;
-  position: relative;
-  word-break: break-all;
 }
 
 .header {
@@ -420,60 +364,65 @@ ul {
 .username {
   font-weight: bold;
 }
-
 .title {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
-
 .content-excerpt {
-  color: #bbb;
+  color: var(--contrasr-color-alpha2);
   flex: 1;
   margin-bottom: 2rem;
   overflow-wrap: break-word;
 }
-
 table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+  border-collapse: separate;
+  text-align: center;
+  border-spacing: 0;
+  border-radius: 10px;
 }
-
 tbody {
   border-top: 5px solid var(--secondary-color);
   border-bottom: 1px solid var(--secondary-color);
   margin: 10px 0;
 }
-
 th,
 td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid var(--secondary-color);
-  border-radius: 5px;
+  transition-property: color, background-color;
+  transition-duration: 0.5s;
+  box-shadow: 3px 3px 3px 3px var(--primary-color);
 }
 
 th {
   background-color: var(--primary-color);
 }
-
 tr {
   background-color: var(--secondary-color);
-  box-shadow: 0 0 5px var(--primary-color);
-  margin: 10px 0;
 }
-
 td:hover {
   background-color: var(--primary-color);
 }
-
 td:nth-child(odd) {
   background-color: var(--secondary-color-light);
-  color: var(--contrasr-color);
 }
-
 td:nth-child(odd):hover {
   background-color: var(--primary-color);
-  color: var(--contrasr-color);
+}
+table tr:first-child,
+th:first-child {
+  border-top-left-radius: 10px;
+}
+table tr:first-child,
+th:last-child {
+  border-top-right-radius: 10px;
+}
+tr:last-child > td:first-child {
+  border-bottom-left-radius: 10px;
+}
+tr:last-child > td:last-child {
+  border-bottom-right-radius: 10px;
 }
 </style>

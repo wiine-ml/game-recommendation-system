@@ -51,24 +51,13 @@ import JSZip from 'jszip'
 import { defineAsyncComponent } from 'vue'
 
 export default {
-  emit: ['closeVendorPage'],
+  emits: ['closeVendorPage'],
   props: {
-    onPriview: {
-      type: Boolean,
-      required: false,
-    },
-    vendor_id_prop: {
-      type: Number,
-      required: false,
-    },
-    vendor_type_prop: {
-      type: String,
-      required: false,
-    },
-    vendor_name_prop: {
-      type: String,
-      required: false,
-    },
+    avtiveMainContent: String,
+    onPriview: Boolean,
+    vendor_id_prop: Number,
+    vendor_type_prop: String,
+    vendor_name_prop: String,
   },
   components: {
     ContentMatrix: defineAsyncComponent(() => import('./ContentMartix.vue')),

@@ -54,7 +54,7 @@ export default {
 
         // 创建图片的 URL
         this.newsImage = URL.createObjectURL(imageResponse.data)
-        console.log(`获取新闻 ${newsId} 的图片成功:`, this.newsImage)
+        console.log(`获取新闻 ${newsId} 的图片成功>>> `, this.newsImage)
       } catch (error) {
         console.error(`获取新闻 ${newsId} 的图片失败:`, error)
         // 如果获取图片失败，使用默认图片
@@ -116,7 +116,7 @@ export default {
 
 .card-description {
   font-size: 14px;
-  color: var(--contrast-color);
+  color: var(--contrast-color-alpha1);
   margin: 8px 0;
 }
 
@@ -124,7 +124,6 @@ export default {
   position: absolute;
   right: 16px;
   bottom: 16px;
-  font-size: 12px;
-  color: #888;
+  color: var(--contrast-color-alpha2);
 }
 </style>

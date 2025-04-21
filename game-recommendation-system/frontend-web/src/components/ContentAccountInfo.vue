@@ -64,12 +64,14 @@
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
+  props: ['activeMainContent'],
   data() {
     return {
       selectedFile: null,
       message: '',
       oldPassword: '',
       newPassword: '',
+      passwordError: '',
       isSubmitting: false,
     }
   },

@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import { markRaw } from 'vue'
+
 export default {
   props: {
     activeMainContent: String,
@@ -163,7 +165,7 @@ export default {
           component = await import('./ErrorHandlingPage.vue')
         }
 
-        this.currentComponent = component.default || component
+        this.currentComponent = markRaw(component.default || component)
       } catch (error) {
         console.error('Error loading component:', error)
         this.currentComponent = (await import('./ErrorHandlingPage.vue')).default
@@ -181,13 +183,13 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .main-content {
   border-radius: 10px;
   background-color: var(--secondary-color);
   box-shadow: 0 0 5px var(--secondary-color);
   padding: 20px;
   height: fit-content;
-  overflow: auto;
+  overflow: hidden;
 }
 </style>

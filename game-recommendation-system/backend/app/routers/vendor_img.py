@@ -355,7 +355,6 @@ def update_vendor_avatar():
 
     return jsonify({"msg": "头像更新成功", "success": True}), 200
 
-
 @vendor_home_page_bp.route('/api/vendor/avatar/delete', methods=['DELETE'])
 def delete_vendor_avatar():
     """删除厂商头像"""

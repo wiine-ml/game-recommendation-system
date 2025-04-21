@@ -96,3 +96,20 @@ body {
 :root {
   --main-color-transparent: #00adb5aa;
 }
+
+@keyframes hrAnimator {
+  0% {
+    transform: translateX(-700px);
+  }
+  100% {
+    transform: translateX(700px);
+  }
+}
+
+hr {
+  border: 0px;
+  margin: 10px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--main-color-alpha2), transparent);
+  animation: hrAnimator 5s infinite linear;
+}
