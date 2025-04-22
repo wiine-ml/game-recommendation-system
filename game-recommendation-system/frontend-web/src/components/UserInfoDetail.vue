@@ -125,13 +125,13 @@ export default {
 
 .user-info-panel {
   position: absolute;
-  bottom: -80px;
+  bottom: -100px;
   left: -29px;
   transform: translateX(-50%);
   background-color: var(--secondary-color-alpha1);
   color: var(--contrast-color);
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   width: 200px;
   z-index: 10;

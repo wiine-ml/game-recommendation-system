@@ -5,12 +5,19 @@
         <h2>{{ gameDetail.gameTitle }}</h2>
         <button @click="closeDetail">x</button>
       </div>
+
       <div class="game-detail-content">
         <div class="game-detail-image">
           <!-- 游戏图片 -->
-          <img :src="originalImage" alt="游戏图片" style="max-width: 100%; max-height: 300px" />
+          <img
+            id="detail-img"
+            :src="originalImage"
+            alt="游戏图片"
+            style="max-width: 100%; max-height: 300px"
+          />
         </div>
         <div class="game-detail-info">
+          <p><strong>游戏ID:</strong> {{ gameDetail.id }}</p>
           <p><strong>游戏类型:</strong> {{ gameDetail.gameGenre }}</p>
           <p><strong>游戏平台:</strong> {{ gameDetail.gamePlatform }}</p>
           <p><strong>游戏开发商:</strong> {{ gameDetail.gameDeveloper }}</p>
@@ -19,10 +26,11 @@
           <p><strong>评分:</strong> {{ gameDetail.rating }}</p>
           <p><strong>评分描述:</strong> {{ gameDetail.ratingPhrase }}</p>
         </div>
-        <div class="game-detail-rating-chart">
-          <div class="chart-container">
-            <vue-echarts :option="chartOption" style="width: 80%; height: 300px" />
-          </div>
+      </div>
+
+      <div class="game-detail-rating-chart">
+        <div class="chart-container">
+          <vue-echarts :option="chartOption" style="height: 300px" />
         </div>
       </div>
     </div>
@@ -148,9 +156,15 @@ export default {
 </script>
 
 <style scoped>
+#detail-img {
+  margin: 0px 20px 10px 0px;
+  border-radius: 20px;
+}
+
 .chart-container {
   width: 80%;
-  height: 200px;
+  border-radius: 20px;
+  background-color: var(--primary-color-alpha2);
 }
 
 .game-detail-overlay {
@@ -194,6 +208,8 @@ export default {
 }
 
 .game-detail-content {
+  display: flex;
+  flex-direction: row;
   overflow-y: auto;
   max-height: 80vh;
 }

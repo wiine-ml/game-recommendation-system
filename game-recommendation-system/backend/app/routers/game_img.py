@@ -121,15 +121,26 @@ def read_promote_image():
 
         if not games:
             return jsonify({"message": "没有游戏数据"}), 200
+        
+        default_image_files = [
+            'default_game_cover_1.jpg',
+            'default_game_cover_2.jpg',
+            'default_game_cover_3.jpg',
+            'default_game_cover_4.jpg',
+            'default_game_cover_5.jpg'
+        ]
+    
+        # 随机选择一张默认图片
+        selected_image = random.choice(default_image_files)
 
         # 创建一个内存中的 ZIP 文件
         zip_buffer = BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for game in games:
                 # 构造图片路径
-                image_filename = game.gameImage if game.gameImage else "defaultGameImage.jpg"
+                image_filename = game.gameImage if game.gameImage else selected_image
                 image_path = construct_image_path(image_filename)
-                print(f"图片路径: {image_path}")  # 打印图片路径，检查是否正确
+                print(f"图片路径: {image_path}")  # log图片路径
 
                 # 检查图片文件是否存在
                 if not check_image_exists(image_path):

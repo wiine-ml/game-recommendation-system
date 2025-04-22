@@ -440,17 +440,15 @@ table tr:first-child,
 th:last-child {
   border-top-right-radius: 10px;
 }
-
 tr:last-child > td:first-child {
   border-bottom-left-radius: 10px;
 }
 tr:last-child > td:last-child {
   border-bottom-right-radius: 10px;
 }
-
 th,
 td {
-  padding: 12px;
+  padding: 10px;
   text-align: left;
 }
 th {
@@ -459,20 +457,18 @@ th {
 tr {
   background-color: var(--secondary-color);
   box-shadow: 0 0 5px var(--primary-color);
-  margin: 10px 0;
+  transition-duration: 0.5s;
 }
 tr:hover {
   background-color: var(--primary-color);
 }
-
 tr:nth-child(odd) {
   background-color: var(--secondary-color-light);
+  transition-duration: 0.5s;
 }
-
 tr:nth-child(odd):hover {
   background-color: var(--primary-color);
 }
-
 a {
   color: var(--main-color);
 }

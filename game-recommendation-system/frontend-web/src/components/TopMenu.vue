@@ -7,11 +7,14 @@
     <div class="navbar-avatar">
       <p v-if="isLogin">{{ welcomeMessage }}</p>
       <p v-else>暂未登录</p>
-      <!-- 邮件按钮，点击后显示 MailBox -->
-      <button id="mail-btn" @click="toggleMailBox" class="mail-button">✉️</button>
+      <!-- 邮件按钮，点击后显示 MailBox✉️ -->
+      <el-button id="mail-box" type="info" @click="toggleMailBox" class="mail-button" circle>
+        <el-icon><Message /></el-icon>
+      </el-button>
       <UserInfoDetail v-if="isLogin" />
     </div>
   </nav>
+
   <nav class="navbar-navigations">
     <!-- 管理员导航栏 -->
     <div class="navbar-bottom-left" v-if="this.$store.getters.currentLoginType === 'admin'">
@@ -195,8 +198,8 @@ export default {
         return '欢迎登陆' + this.$store.getters['vendor/vendorName']
       } else {
         console.error('Unknown login type')
+        return ''
       }
-      return ''
     },
     onSearchComplete() {
       console.log(
@@ -227,17 +230,14 @@ export default {
   }
 }
 
-#logo-icon {
-  animation: ImgRotate 30s infinite linear;
+#mail-box {
+  margin: 0px 10px 7px 10px;
+  width: 40px;
+  height: 40px;
 }
 
-#mail-btn {
-  background-color: var(--secondary-color-alpha2);
-  border-radius: 10px;
-  font-size: 25px;
-  margin: 0px 15px;
-  border: solid 3px var(--secondary-color);
-  cursor: pointer;
+#logo-icon {
+  animation: ImgRotate 30s infinite linear;
 }
 
 .search-suggestions {

@@ -18,11 +18,18 @@ import { TitleComponent, TooltipComponent, GridComponent } from 'echarts/compone
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
+//引入element-icon
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
 //路由跳转
 
 echarts.use([BarChart, TitleComponent, TooltipComponent, GridComponent])
 
 const app = createApp(App)
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
 
 app.config.globalProperties.$axios = axios
 app.config.globalProperties.$echarts = echarts

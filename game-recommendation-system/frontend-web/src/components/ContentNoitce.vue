@@ -4,7 +4,8 @@
       <li v-for="(item, index) in currentNotices" :key="index" class="content-item">
         <div class="header">
           <div class="avatar">
-            <img src="/defaultUserImg.jpg" alt="/public/guest.jpg" />
+            <!--<img src="/defaultUserImg.jpg" alt="/public/guest.jpg" />-->
+            <el-avatar> Admin </el-avatar>
           </div>
           <div class="username">{{ item.username }}</div>
         </div>
@@ -132,6 +133,12 @@ export default {
 </script>
 
 <style scoped>
+.el-avatar {
+  background-color: var(--main-color);
+  color: white;
+  margin-right: 10px;
+}
+
 hr {
   margin: 0px 20px;
 }
@@ -147,7 +154,7 @@ hr {
 }
 
 .pagination button {
-  margin: 0 5px;
+  margin: 0 10px;
   padding: 5px 10px;
   cursor: pointer;
 }
@@ -159,16 +166,10 @@ hr {
 }
 
 .pagination button:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.content-list {
-  height: 100%;
-  overflow: auto;
-}
 ul {
-  list-style: none;
   padding: 0;
   margin: 0;
 }
@@ -185,22 +186,15 @@ ul {
   align-items: center;
   margin-bottom: 0.5rem;
 }
-.avatar img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 0.5rem;
-  object-fit: cover;
-}
 .username {
   font-weight: bold;
 }
 .title {
   font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  margin: 0.5rem 0.5rem 0rem 0rem;
 }
 .content-excerpt {
-  color: #bbb;
+  color: var(--contrast-color-alpha1);
   flex: 1;
   margin-bottom: 2rem;
   overflow-wrap: break-word;
@@ -209,6 +203,6 @@ ul {
   position: absolute;
   bottom: 1rem;
   right: 1rem;
-  color: #999;
+  color: var(--contrast-color-alpha2);
 }
 </style>
