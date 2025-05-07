@@ -8,7 +8,7 @@
       <p v-if="isLogin">{{ welcomeMessage }}</p>
       <p v-else>暂未登录</p>
       <!-- 邮件按钮，点击后显示 MailBox✉️ -->
-      <el-button id="mail-box" type="info" @click="toggleMailBox" class="mail-button" circle>
+      <el-button id="mail-box" type="primary" @click="toggleMailBox" class="mail-button" circle>
         <el-icon><Message /></el-icon>
       </el-button>
       <UserInfoDetail v-if="isLogin" />

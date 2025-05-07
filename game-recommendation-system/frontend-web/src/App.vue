@@ -38,6 +38,7 @@ import MainContentBox from './components/MainContentBox.vue'
 import { mapActions } from 'vuex'
 
 export default {
+  inheritAttrs: false,
   components: {
     TopMenu,
     SubMenu,

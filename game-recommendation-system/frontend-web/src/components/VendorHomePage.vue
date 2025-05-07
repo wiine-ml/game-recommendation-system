@@ -51,9 +51,10 @@ import JSZip from 'jszip'
 import { defineAsyncComponent } from 'vue'
 
 export default {
+  inheritAttrs: false,
   emits: ['closeVendorPage'],
   props: {
-    avtiveMainContent: String,
+    activeMainContent: String,
     onPriview: Boolean,
     vendor_id_prop: Number,
     vendor_type_prop: String,

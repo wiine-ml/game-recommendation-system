@@ -252,6 +252,8 @@ def delete_vendor_head_image():
 @vendor_home_page_bp.route('/api/vendor/avatar/upload', methods=['POST'])
 def upload_vendor_avatar():
     """上传厂商头像"""
+    print(request.form)
+    print(request.files)
     vendor_id = request.form.get('vendor_id')
     vendor_type = request.form.get('vendor_type')
     file = request.files.get('file')

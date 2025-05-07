@@ -117,6 +117,7 @@ import GameDetail from './GameDetail.vue'
 import VendorHomePage from './VendorHomePage.vue'
 
 export default {
+  inheritAttrs: false,
   props: {
     activeMainContent: {
       type: String,
@@ -128,6 +129,7 @@ export default {
       default: true,
     },
     vendorID: {
+      type: Number,
       required: false,
       default: null,
     },

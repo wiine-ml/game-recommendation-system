@@ -248,7 +248,7 @@ export default {
 }
 
 .message {
-  color: #333;
+  color: var(--contrast-color);
   font-size: 14px;
   height: 20px;
 }

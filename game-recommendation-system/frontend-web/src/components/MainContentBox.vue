@@ -8,10 +8,11 @@
 import { markRaw } from 'vue'
 
 export default {
+  name: 'MainContentBox',
+  inheritAttrs: false,
   props: {
     activeMainContent: String,
   },
-  name: 'MainContentBox',
   data() {
     return {
       lastComponent: null,

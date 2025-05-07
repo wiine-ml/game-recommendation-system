@@ -38,7 +38,12 @@
   </div>
 
   <!-- 厂商游戏列表 -->
-  <ContentMatrix :activeMainContent="activeContent" :interactable="false" class="vendor-games" />
+  <ContentMatrix
+    :activeMainContent="activeContent"
+    :interactable="false"
+    :vendorID="cur_vendor_ID"
+    class="vendor-games"
+  />
 </template>
 
 <script>
@@ -60,6 +65,11 @@ export default {
   },
   components: {
     ContentMatrix,
+  },
+  computed: {
+    cur_vendor_ID() {
+      return this.$store.getters['vendor/vendorID']
+    },
   },
   methods: {
     // 获取厂商推广图片

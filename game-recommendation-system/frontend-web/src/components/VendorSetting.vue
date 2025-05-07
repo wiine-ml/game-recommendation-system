@@ -17,15 +17,22 @@
         ref="fileInput"
         style="display: none"
       />
-      <button id="confirm-btn" @click="triggerFileInput" :disabled="uploading">
+      <el-button type="success" id="confirm-btn" @click="triggerFileInput" :disabled="uploading">
         <span v-if="!uploading">上传头像</span>
         <span v-else>上传中...</span>
-      </button>
+      </el-button>
     </div>
 
     <!-- 操作按钮 -->
     <div class="actions">
-      <button id="del-btn" @click="deleteVendorAvatar" v-if="hasAvatar">删除头像</button>
+      <el-button type="danger" id="del-btn" @click="deleteVendorAvatar" v-if="hasAvatar"
+        >删除头像</el-button
+      >
+    </div>
+
+    <!-- 头像预览区域 -->
+    <div class="avatar-preview" v-if="avatarPreviewUrl">
+      <img :src="avatarPreviewUrl" alt="头像预览" />
     </div>
 
     <!-- 操作结果提示 -->
@@ -42,6 +49,8 @@ export default {
       selectedFile: null,
       message: '',
       uploading: false,
+      uploadProgress: 0, // 文件上传进度
+      avatarPreviewUrl: null, // 头像预览 URL
     }
   },
   computed: {
@@ -61,19 +70,31 @@ export default {
       const file = event.target.files[0]
       if (file) {
         this.selectedFile = file
+        this.handleAvatarPreview(file) // 调用头像预览方法
+        this.uploadVendorAvatar() // 调用上传头像方法
       }
     },
+    handleAvatarPreview(file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        this.avatarPreviewUrl = e.target.result
+      }
+      reader.readAsDataURL(file)
+    },
     async uploadVendorAvatar() {
-      if (!this.selectedFile || !this.isLogin) return
+      if (!this.selectedFile || !this.isLogin) {
+        console.log('当前没有选择文件')
+        return
+      }
 
       this.uploading = true
       this.message = ''
 
       try {
-        const formData = new FormData()
-        formData.append('vendor_id', this.vendorID)
-        formData.append('vendor_type', this.vendorType)
-        formData.append('file', this.selectedFile)
+        //const formData = new FormData()
+        //formData.append('vendor_id', this.vendorID)
+        //formData.append('vendor_type', this.vendorType)
+        //formData.append('file', this.selectedFile)
 
         const response = await this.$store.dispatch('vendor/uploadAvatar', this.selectedFile)
 
@@ -89,7 +110,7 @@ export default {
       } finally {
         this.uploading = false
         this.selectedFile = null
-        this.$refs.fileInput.value = null // 重置文件输入
+        this.$refs.fileInput.value = null
       }
     },
     async deleteVendorAvatar() {
@@ -114,7 +135,8 @@ export default {
     if (this.isLogin) {
       this.$store.dispatch('vendor/fetchAvatar').then((response) => {
         if (response.success) {
-          this.$store.commit('vendor/setAvatarUrl', response.data.avatarUrl)
+          console.log(response)
+          this.$store.commit('vendor/setAvatarUrl', response.avatarUrl)
         }
       })
     }
@@ -130,7 +152,6 @@ export default {
   padding: 20px;
   background-color: var(--primary-color);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
@@ -160,7 +181,7 @@ h2 {
 button {
   padding: 10px 20px;
   background-color: #4caf50;
-  color: white;
+  color: var(--contrast-color);
   border: none;
   border-radius: 4px;
   cursor: pointer;

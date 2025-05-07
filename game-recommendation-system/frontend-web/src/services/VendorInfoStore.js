@@ -160,6 +160,8 @@ const VendorInfoStore = {
           responseType: 'blob',
         })
 
+        console.log('API Response:', response) // 打印响应以检查格式
+
         //
         const blob = new Blob([response.data], { type: response.headers['content-type'] })
         const avatarUrl = URL.createObjectURL(blob)
@@ -167,7 +169,7 @@ const VendorInfoStore = {
 
         commit('setAvatarUrl', avatarUrl) // 需要添加对应的 mutation
         console.log('Blob size:' + blob.size)
-        return { success: true }
+        return { success: true, avatarUrl: avatarUrl }
       } catch (error) {
         console.error('Fetch avatar failed:', error)
         return { success: false }
@@ -183,7 +185,9 @@ const VendorInfoStore = {
         formData.append('vendor_type', state.vendorType)
         formData.append('avatar', file)
 
-        await apiClient.post('/vendor/avatar/set', formData, {
+        console.log('上传的文件:', file)
+
+        await apiClient.post('/vendor/avatar/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -201,7 +205,7 @@ const VendorInfoStore = {
         return { success: false, msg: 'Vendor not logged in' }
       }
       try {
-        await apiClient.post('/vendor/avatar/delete', {
+        await apiClient.delete('/vendor/avatar/delete', {
           vendor_id: state.vendorID,
           vendor_type: state.vendorType,
         })
