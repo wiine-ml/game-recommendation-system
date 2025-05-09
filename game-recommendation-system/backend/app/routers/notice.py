@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from ..models import Notice
+from ..models import Notice, Mail, User
 from datetime import datetime
 
 
@@ -21,6 +21,25 @@ def create_notice():
 
     try:
         new_notice = Notice.create_notice(avatar, username, title, content, date)
+
+         # 获取所有用户ID
+        users = User.query.all()
+        user_ids = [user.id for user in users]
+
+        # 构造邮件内容
+        mail_content = f"尊敬的用户，有新的公告发布：{title}\n\n{content}"
+
+        # 向每个用户发送邮件
+        for user_id in user_ids:
+            new_mail = Mail(
+                sender_type="系统",
+                sender_id=0,  # 假设系统ID为0
+                receiver_type="user",
+                receiver_id=user_id,
+                msg_content=mail_content
+            )
+            new_mail.save()
+
         return jsonify({
             "notice": new_notice.to_dict(),
             "msg": "公告创建成功",

@@ -97,7 +97,7 @@ body {
   --main-color-transparent: #00adb5aa;
 }
 
-@keyframes hrAnimator {
+@keyframes hrAnimator-small {
   0% {
     transform: translateX(-700px);
   }
@@ -106,10 +106,30 @@ body {
   }
 }
 
+@keyframes hrAnimator-large {
+  0% {
+    transform: translateX(-1500px);
+  }
+  100% {
+    transform: translateX(1500px);
+  }
+}
+
 hr {
   border: 0px;
   margin: 10px;
   height: 1px;
   background: linear-gradient(to right, transparent, var(--main-color-alpha2), transparent);
-  animation: hrAnimator 5s infinite linear;
+}
+
+@media (max-width: 1280px) {
+  hr {
+    animation: hrAnimator-small 5s infinite linear;
+  }
+}
+
+@media (min-width: 1280px) {
+  hr {
+    animation: hrAnimator-large 5s infinite linear;
+  }
 }

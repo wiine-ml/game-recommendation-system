@@ -118,6 +118,10 @@ export default {
             case '删除管理员':
               component = await import('./ManageDelete.vue')
               break
+            case '推荐参数':
+            case '推荐状态':
+              component = await import('./ManageRecommendation.vue')
+              break
             default:
               component = await import('./ErrorHandlingPage.vue')
           }

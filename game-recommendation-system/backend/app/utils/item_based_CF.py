@@ -1,6 +1,6 @@
 from collections import defaultdict
 import math
-from database import db
+from database import db, SIMILARITY_METHOD
 from ..models import Interaction
 
 
@@ -42,7 +42,7 @@ def get_item_interaction_matrix():
         
     return item_interaction_matrix
 
-def calculate_item_similarity(item_interaction_matrix, similarity_method='cosine'):
+def calculate_item_similarity(item_interaction_matrix, similarity_method=SIMILARITY_METHOD):
     """
     计算物品之间的相似度
     参数：

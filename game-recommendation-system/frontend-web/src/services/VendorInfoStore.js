@@ -95,6 +95,7 @@ const VendorInfoStore = {
       state.foundedYear = null
       state.avatarFile = null
       state.avatarUrl = ''
+
       localStorage.removeItem('vendorToken')
       localStorage.removeItem('vendorID')
       localStorage.removeItem('vendorName')
